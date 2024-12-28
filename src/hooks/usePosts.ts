@@ -10,7 +10,7 @@ export interface Post {
   author: string;
   content?: string;
   image?: string;
-  category_id?: string;
+  categoryId?: string;
 }
 
 export function usePosts() {
@@ -27,7 +27,7 @@ export function usePosts() {
 
       if (error) throw error;
       setPosts(data || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching posts:', error);
       toast({
         title: "Error",
@@ -43,19 +43,23 @@ export function usePosts() {
     fetchPosts();
   }, []);
 
-  const savePost = async (data: Post) => {
+  const savePost = async (post: Post) => {
     try {
+      const postData = {
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        published: post.published,
+        date: post.date,
+        author: post.author,
+        image: post.image,
+        category_id: post.categoryId // Match the database column name
+      };
+
       const { error } = await supabase
         .from('posts')
-        .upsert({
-          id: data.id,
-          title: data.title,
-          content: data.content,
-          published: data.published,
-          date: data.date,
-          author: data.author,
-          image: data.image,
-          category_id: data.category_id,
+        .upsert(postData, {
+          onConflict: 'id'
         });
 
       if (error) throw error;
@@ -67,11 +71,11 @@ export function usePosts() {
       
       await fetchPosts();
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving post:', error);
       toast({
         title: "Error",
-        description: "Failed to save post",
+        description: error.message || "Failed to save post",
         variant: "destructive",
       });
       return false;
@@ -79,10 +83,10 @@ export function usePosts() {
   };
 
   const togglePublish = async (postId: string) => {
-    const post = posts.find(p => p.id === postId);
-    if (!post) return false;
-
     try {
+      const post = posts.find(p => p.id === postId);
+      if (!post) return false;
+
       const { error } = await supabase
         .from('posts')
         .update({ published: !post.published })
@@ -97,11 +101,11 @@ export function usePosts() {
       
       await fetchPosts();
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error toggling post publish state:', error);
       toast({
         title: "Error",
-        description: "Failed to update post status",
+        description: error.message || "Failed to update post status",
         variant: "destructive",
       });
       return false;
@@ -124,11 +128,11 @@ export function usePosts() {
       
       await fetchPosts();
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting post:', error);
       toast({
         title: "Error",
-        description: "Failed to delete post",
+        description: error.message || "Failed to delete post",
         variant: "destructive",
       });
       return false;

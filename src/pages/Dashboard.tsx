@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { PenIcon, Trash2Icon, EyeIcon, EyeOffIcon, SearchIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { CategoryManager } from "@/components/CategoryManager";
 
 interface Post {
   id: string;
@@ -15,12 +16,19 @@ interface Post {
   author: string;
   content?: string;
   image?: string;
+  categoryId?: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
 }
 
 const POSTS_PER_PAGE = 10;
 
 const Dashboard = () => {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -56,6 +64,10 @@ const Dashboard = () => {
     setPosts(posts.filter(post => post.id !== postId));
   };
 
+  const handleCategoryChange = (updatedCategories: Category[]) => {
+    setCategories(updatedCategories);
+  };
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="flex justify-between items-center mb-8">
@@ -68,9 +80,17 @@ const Dashboard = () => {
             <SheetHeader>
               <SheetTitle>Créer un Nouveau Post</SheetTitle>
             </SheetHeader>
-            <PostEditor onSubmit={handleSavePost} />
+            <PostEditor onSubmit={handleSavePost} categories={categories} />
           </SheetContent>
         </Sheet>
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Gestion des Catégories</h2>
+        <CategoryManager 
+          categories={categories}
+          onCategoryChange={handleCategoryChange}
+        />
       </div>
 
       <div className="mb-6">
@@ -91,6 +111,7 @@ const Dashboard = () => {
             <TableRow>
               <TableHead>Image</TableHead>
               <TableHead>Titre</TableHead>
+              <TableHead>Catégorie</TableHead>
               <TableHead>Auteur</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Statut</TableHead>
@@ -110,6 +131,9 @@ const Dashboard = () => {
                   )}
                 </TableCell>
                 <TableCell className="font-medium">{post.title}</TableCell>
+                <TableCell>
+                  {categories.find(cat => cat.id === post.categoryId)?.name || '-'}
+                </TableCell>
                 <TableCell>{post.author}</TableCell>
                 <TableCell>{new Date(post.date).toLocaleDateString("fr-FR")}</TableCell>
                 <TableCell>
@@ -137,7 +161,11 @@ const Dashboard = () => {
                         <SheetHeader>
                           <SheetTitle>Modifier le Post</SheetTitle>
                         </SheetHeader>
-                        <PostEditor post={post} onSubmit={handleSavePost} />
+                        <PostEditor 
+                          post={post} 
+                          onSubmit={handleSavePost} 
+                          categories={categories}
+                        />
                       </SheetContent>
                     </Sheet>
                     <Button

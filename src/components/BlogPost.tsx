@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { PostHeader } from "./blog/PostHeader";
 import { CommentSection } from "./blog/CommentSection";
 import { RelatedPosts } from "./blog/RelatedPosts";
 
-interface BlogPostProps {
+interface Post {
+  id: string;
   title: string;
   content: string;
   date: string;
-  image: string;
   author: string;
+  image: string;
 }
 
 const calculateReadingTime = (content: string): number => {
@@ -20,60 +21,65 @@ const calculateReadingTime = (content: string): number => {
   return Math.ceil(wordCount / wordsPerMinute);
 };
 
-// Sample related posts - in a real app, these would come from your backend
-const relatedPosts = [
-  {
-    id: "2",
-    title: "La Foi dans les Moments Difficiles",
-    excerpt: "Comment maintenir sa foi pendant les périodes d'épreuve...",
-    image: "https://images.unsplash.com/photo-1482938289607-e9573fc25ebb",
-  },
-  {
-    id: "3",
-    title: "L'Importance de la Prière Quotidienne",
-    excerpt: "Découvrez comment la prière peut transformer votre vie...",
-    image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9",
-  },
-  {
-    id: "4",
-    title: "Comprendre les Écritures",
-    excerpt: "Un guide pratique pour mieux comprendre la Bible...",
-    image: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86",
-  },
-];
-
-export const BlogPost = ({ title, content, date, image, author }: BlogPostProps) => {
-  const [comments, setComments] = useState([]);
+export const BlogPost = () => {
+  const [post, setPost] = useState<Post | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { id: postId } = useParams();
   const { toast } = useToast();
-  const readingTime = calculateReadingTime(content);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchComments = async () => {
+    const fetchPost = async () => {
       if (!postId) return;
-      
+
       const { data, error } = await supabase
-        .from("comments")
+        .from("posts")
         .select("*")
-        .eq("post_id", postId)
-        .order("created_at", { ascending: false });
+        .eq("id", postId)
+        .single();
 
       if (error) {
-        console.error("Error fetching comments:", error);
+        console.error("Error fetching post:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load the post",
+          variant: "destructive",
+        });
+        navigate("/blog");
         return;
       }
 
-      setComments(data || []);
+      setPost(data);
+      setIsLoading(false);
     };
 
-    fetchComments();
-  }, [postId]);
+    fetchPost();
+  }, [postId, navigate, toast]);
+
+  if (isLoading || !post) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-64 bg-gray-200 rounded"></div>
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-full"></div>
+            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+            <div className="h-4 bg-gray-200 rounded w-4/6"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const readingTime = calculateReadingTime(post.content);
 
   const handleShare = async () => {
     try {
       await navigator.share({
-        title,
-        text: content.substring(0, 100) + "...",
+        title: post.title,
+        text: post.content.substring(0, 100) + "...",
         url: window.location.href,
       });
     } catch (err) {
@@ -85,22 +91,22 @@ export const BlogPost = ({ title, content, date, image, author }: BlogPostProps)
     <div className="max-w-4xl mx-auto px-4 py-8 animate-fade-in">
       <article className="space-y-4">
         <PostHeader
-          title={title}
-          date={date}
-          author={author}
+          title={post.title}
+          date={post.date}
+          author={post.author}
           readingTime={readingTime}
-          image={image}
+          image={post.image}
           onShare={handleShare}
         />
 
         <div
           className="prose prose-lg prose-gray max-w-none"
-          dangerouslySetInnerHTML={{ __html: content }}
+          dangerouslySetInnerHTML={{ __html: post.content }}
         />
       </article>
 
-      <CommentSection postId={postId || ""} comments={comments} />
-      <RelatedPosts posts={relatedPosts} />
+      <CommentSection postId={postId || ""} />
+      <RelatedPosts posts={[]} />
     </div>
   );
 };

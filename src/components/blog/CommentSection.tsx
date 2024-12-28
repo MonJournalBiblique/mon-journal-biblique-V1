@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,41 +16,69 @@ interface Comment {
 
 interface CommentSectionProps {
   postId: string;
-  comments: Comment[];
 }
 
-export const CommentSection = ({ postId, comments }: CommentSectionProps) => {
+export const CommentSection = ({ postId }: CommentSectionProps) => {
+  const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      const { data: commentsData, error } = await supabase
+        .from("comments")
+        .select("*")
+        .eq("post_id", postId)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching comments:", error);
+        return;
+      }
+
+      setComments(commentsData || []);
+    };
+
+    if (postId) {
+      fetchComments();
+    }
+  }, [postId]);
 
   const handleSubmitComment = async () => {
     if (!newComment.trim()) return;
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase
-        .from("comments")
-        .insert([
-          {
-            post_id: postId,
-            content: newComment,
-            author: "Anonymous", // Replace with actual user name when auth is implemented
-          }
-        ]);
+      const { error } = await supabase.from("comments").insert([
+        {
+          post_id: postId,
+          content: newComment,
+          author: "Anonymous", // Replace with actual user name when auth is implemented
+        },
+      ]);
 
       if (error) throw error;
 
       toast({
-        title: "Succès",
-        description: "Votre commentaire a été ajouté",
+        title: "Success",
+        description: "Your comment has been added",
       });
 
       setNewComment("");
+      
+      // Refresh comments
+      const { data: commentsData } = await supabase
+        .from("comments")
+        .select("*")
+        .eq("post_id", postId)
+        .order("created_at", { ascending: false });
+
+      setComments(commentsData || []);
     } catch (error: any) {
       toast({
-        title: "Erreur",
-        description: "Impossible d'ajouter votre commentaire",
+        title: "Error",
+        description: "Unable to add your comment",
         variant: "destructive",
       });
     } finally {
@@ -62,12 +90,12 @@ export const CommentSection = ({ postId, comments }: CommentSectionProps) => {
     <section className="mt-16 space-y-8">
       <h2 className="text-2xl font-serif font-bold flex items-center gap-2">
         <MessageCircle className="w-6 h-6" />
-        Commentaires
+        Comments
       </h2>
 
       <div className="space-y-4">
         <Textarea
-          placeholder="Ajouter un commentaire..."
+          placeholder="Add a comment..."
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           className="min-h-[100px]"
@@ -76,7 +104,7 @@ export const CommentSection = ({ postId, comments }: CommentSectionProps) => {
           onClick={handleSubmitComment}
           disabled={isSubmitting || !newComment.trim()}
         >
-          Publier
+          Publish
         </Button>
       </div>
 

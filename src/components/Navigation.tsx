@@ -1,22 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, BookOpen, Home, PenTool } from "lucide-react";
+import { Menu, X, BookOpen, Home, PenTool, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Category {
   id: string;
   name: string;
 }
 
-interface NavigationProps {
-  categories?: Category[];
-}
-
-export const Navigation = ({ categories = [] }: NavigationProps) => {
+export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [showBlogMenu, setShowBlogMenu] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const { data } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name');
+      if (data) setCategories(data);
+    };
+
+    fetchCategories();
+  }, []);
 
   return (
     <nav className="bg-white shadow-sm">
@@ -32,12 +43,39 @@ export const Navigation = ({ categories = [] }: NavigationProps) => {
           {/* Desktop Menu */}
           <div className="hidden sm:flex sm:items-center sm:space-x-8">
             <NavLink to="/">Accueil</NavLink>
-            <NavLink to="/blog">Blog</NavLink>
-            {categories.map(category => (
-              <NavLink key={category.id} to={`/blog/category/${category.id}`}>
-                {category.name}
-              </NavLink>
-            ))}
+            <div className="relative group">
+              <button
+                className="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 font-medium"
+                onClick={() => setShowBlogMenu(!showBlogMenu)}
+              >
+                Blog
+                <ChevronDown className="ml-1 h-4 w-4" />
+              </button>
+              <div className={cn(
+                "absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-200",
+                showBlogMenu ? "opacity-100 visible" : "opacity-0 invisible"
+              )}>
+                <div className="py-1">
+                  <Link
+                    to="/blog"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => setShowBlogMenu(false)}
+                  >
+                    All Posts
+                  </Link>
+                  {categories.map(category => (
+                    <Link
+                      key={category.id}
+                      to={`/blog/category/${category.id}`}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setShowBlogMenu(false)}
+                    >
+                      {category.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
             <NavLink to="/dashboard">Dashboard</NavLink>
           </div>
 
@@ -63,7 +101,7 @@ export const Navigation = ({ categories = [] }: NavigationProps) => {
       <div
         className={cn(
           "sm:hidden",
-          isOpen ? "block animate-fade-in" : "hidden"
+          isOpen ? "block" : "hidden"
         )}
       >
         <div className="pt-2 pb-3 space-y-1">
@@ -73,7 +111,7 @@ export const Navigation = ({ categories = [] }: NavigationProps) => {
           </MobileNavLink>
           <MobileNavLink to="/blog" onClick={toggleMenu}>
             <BookOpen className="h-5 w-5 mr-2" />
-            Blog
+            All Posts
           </MobileNavLink>
           {categories.map(category => (
             <MobileNavLink

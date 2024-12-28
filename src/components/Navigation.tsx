@@ -4,7 +4,16 @@ import { Menu, X, BookOpen, Home, PenTool } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export const Navigation = () => {
+interface Category {
+  id: string;
+  name: string;
+}
+
+interface NavigationProps {
+  categories?: Category[];
+}
+
+export const Navigation = ({ categories = [] }: NavigationProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -24,6 +33,11 @@ export const Navigation = () => {
           <div className="hidden sm:flex sm:items-center sm:space-x-8">
             <NavLink to="/">Accueil</NavLink>
             <NavLink to="/blog">Blog</NavLink>
+            {categories.map(category => (
+              <NavLink key={category.id} to={`/blog/category/${category.id}`}>
+                {category.name}
+              </NavLink>
+            ))}
             <NavLink to="/dashboard">Dashboard</NavLink>
           </div>
 
@@ -61,6 +75,16 @@ export const Navigation = () => {
             <BookOpen className="h-5 w-5 mr-2" />
             Blog
           </MobileNavLink>
+          {categories.map(category => (
+            <MobileNavLink
+              key={category.id}
+              to={`/blog/category/${category.id}`}
+              onClick={toggleMenu}
+            >
+              <BookOpen className="h-5 w-5 mr-2" />
+              {category.name}
+            </MobileNavLink>
+          ))}
           <MobileNavLink to="/dashboard" onClick={toggleMenu}>
             <PenTool className="h-5 w-5 mr-2" />
             Dashboard

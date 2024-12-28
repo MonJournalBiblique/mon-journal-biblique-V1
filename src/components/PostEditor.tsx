@@ -1,11 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Editor } from '@tinymce/tinymce-react';
+
+interface Category {
+  id: string;
+  name: string;
+}
 
 interface PostEditorProps {
   post?: {
@@ -16,11 +21,13 @@ interface PostEditorProps {
     author: string;
     content?: string;
     image?: string;
+    categoryId?: string;
   };
+  categories: Category[];
   onSubmit: (data: any) => void;
 }
 
-export function PostEditor({ post, onSubmit }: PostEditorProps) {
+export function PostEditor({ post, categories, onSubmit }: PostEditorProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState(post?.image || '');
 
@@ -31,6 +38,7 @@ export function PostEditor({ post, onSubmit }: PostEditorProps) {
       author: post?.author || "",
       published: post?.published || false,
       image: post?.image || "",
+      categoryId: post?.categoryId || "",
     },
   });
 
@@ -78,6 +86,30 @@ export function PostEditor({ post, onSubmit }: PostEditorProps) {
 
         <FormField
           control={form.control}
+          name="categoryId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Catégorie</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner une catégorie" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="image"
           render={({ field: { value, onChange, ...field } }) => (
             <FormItem>
@@ -111,7 +143,7 @@ export function PostEditor({ post, onSubmit }: PostEditorProps) {
               <FormLabel>Contenu</FormLabel>
               <FormControl>
                 <Editor
-                  apiKey="your-tinymce-api-key"
+                  apiKey="kvzhkvlb9uozsltwaguv17ft2v756md2fgnt5p4gadrl0pak"
                   value={field.value}
                   onEditorChange={(content) => field.onChange(content)}
                   init={{

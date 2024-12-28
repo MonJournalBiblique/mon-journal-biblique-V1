@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export interface Category {
   id: string;
@@ -9,24 +9,32 @@ export interface Category {
 
 export function useCategories() {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   const fetchCategories = async () => {
     try {
+      setIsLoading(true);
       const { data, error } = await supabase
         .from('categories')
         .select('*')
         .order('name');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching categories:', error);
+        throw error;
+      }
+      
       setCategories(data || []);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
+    } catch (error: any) {
+      console.error('Error in fetchCategories:', error);
       toast({
         title: "Error",
-        description: "Failed to load categories",
+        description: "Failed to load categories. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -36,6 +44,7 @@ export function useCategories() {
 
   return {
     categories,
+    isLoading,
     refreshCategories: fetchCategories,
   };
 }

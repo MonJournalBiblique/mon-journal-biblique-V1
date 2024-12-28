@@ -1,12 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useState } from "react";
-import { PostEditor } from "@/components/PostEditor";
+import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { PenIcon, Trash2Icon, EyeIcon, EyeOffIcon, SearchIcon } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { PostEditor } from "@/components/PostEditor";
 import { CategoryManager } from "@/components/CategoryManager";
+import { PostsTable } from "@/components/dashboard/PostsTable";
+import { SearchBar } from "@/components/dashboard/SearchBar";
+import { DashboardPagination } from "@/components/dashboard/DashboardPagination";
 
 interface Post {
   id: string;
@@ -94,124 +93,23 @@ const Dashboard = () => {
       </div>
 
       <div className="mb-6">
-        <div className="relative">
-          <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-          <Input
-            placeholder="Rechercher un post..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
+        <SearchBar value={searchQuery} onChange={setSearchQuery} />
       </div>
 
       <div className="bg-white rounded-lg shadow-md">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Image</TableHead>
-              <TableHead>Titre</TableHead>
-              <TableHead>Catégorie</TableHead>
-              <TableHead>Auteur</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedPosts.map((post) => (
-              <TableRow key={post.id}>
-                <TableCell>
-                  {post.image && (
-                    <img
-                      src={post.image}
-                      alt={post.title}
-                      className="w-16 h-16 object-cover rounded"
-                    />
-                  )}
-                </TableCell>
-                <TableCell className="font-medium">{post.title}</TableCell>
-                <TableCell>
-                  {categories.find(cat => cat.id === post.categoryId)?.name || '-'}
-                </TableCell>
-                <TableCell>{post.author}</TableCell>
-                <TableCell>{new Date(post.date).toLocaleDateString("fr-FR")}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => togglePublish(post.id)}
-                  >
-                    {post.published ? (
-                      <EyeIcon className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <EyeOffIcon className="h-4 w-4 text-gray-500" />
-                    )}
-                  </Button>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Sheet>
-                      <SheetTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <PenIcon className="h-4 w-4" />
-                        </Button>
-                      </SheetTrigger>
-                      <SheetContent className="w-[90vw] sm:max-w-2xl overflow-y-auto">
-                        <SheetHeader>
-                          <SheetTitle>Modifier le Post</SheetTitle>
-                        </SheetHeader>
-                        <PostEditor 
-                          post={post} 
-                          onSubmit={handleSavePost} 
-                          categories={categories}
-                        />
-                      </SheetContent>
-                    </Sheet>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deletePost(post.id)}
-                    >
-                      <Trash2Icon className="h-4 w-4 text-red-500" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <PostsTable
+          posts={paginatedPosts}
+          categories={categories}
+          onTogglePublish={togglePublish}
+          onDeletePost={deletePost}
+          onSavePost={handleSavePost}
+        />
 
-        {totalPages > 1 && (
-          <div className="py-4">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    isDisabled={currentPage === 1}
-                  />
-                </PaginationItem>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      onClick={() => setCurrentPage(page)}
-                      isActive={currentPage === page}
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    isDisabled={currentPage === totalPages}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
-        )}
+        <DashboardPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
     </div>
   );

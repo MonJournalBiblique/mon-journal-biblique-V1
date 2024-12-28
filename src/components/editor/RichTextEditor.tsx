@@ -10,26 +10,37 @@ interface RichTextEditorProps {
 
 export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
   const [apiKey, setApiKey] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchApiKey = async () => {
-      const { data: { TINYMCE_API_KEY }, error } = await supabase.functions.invoke('get-secret', {
-        body: { secretName: 'TINYMCE_API_KEY' }
-      });
-      
-      if (error) {
-        console.error('Error fetching TinyMCE API key:', error);
-        return;
+      try {
+        const { data: { TINYMCE_API_KEY }, error } = await supabase.functions.invoke('get-secret', {
+          body: { secretName: 'TINYMCE_API_KEY' }
+        });
+        
+        if (error) {
+          console.error('Error fetching TinyMCE API key:', error);
+          return;
+        }
+        
+        setApiKey(TINYMCE_API_KEY);
+      } catch (error) {
+        console.error('Failed to fetch API key:', error);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setApiKey(TINYMCE_API_KEY);
     };
 
     fetchApiKey();
   }, []);
 
+  if (isLoading) {
+    return <div className="h-[500px] flex items-center justify-center">Loading editor...</div>;
+  }
+
   if (!apiKey) {
-    return <div>Loading editor...</div>;
+    return <div className="h-[500px] flex items-center justify-center">Failed to load editor. Please check your API key configuration.</div>;
   }
 
   return (
@@ -52,6 +63,15 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
               'bold italic forecolor | alignleft aligncenter ' +
               'alignright alignjustify | bullist numlist outdent indent | ' +
               'removeformat | help',
+            // Add these settings for domain verification
+            content_css: 'default',
+            skin: 'oxide',
+            promotion: false,
+            setup: (editor) => {
+              editor.on('init', () => {
+                console.log('TinyMCE Editor initialized');
+              });
+            }
           }}
         />
       </FormControl>

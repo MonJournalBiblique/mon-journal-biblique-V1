@@ -161,7 +161,7 @@ const Dashboard = () => {
                 <PaginationItem>
                   <PaginationPrevious
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
+                    isDisabled={currentPage === 1}
                   />
                 </PaginationItem>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -177,7 +177,7 @@ const Dashboard = () => {
                 <PaginationItem>
                   <PaginationNext
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
+                    isDisabled={currentPage === totalPages}
                   />
                 </PaginationItem>
               </PaginationContent>

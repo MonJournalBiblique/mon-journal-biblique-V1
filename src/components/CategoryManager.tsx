@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Trash2Icon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Category {
   id: string;
@@ -18,10 +19,28 @@ interface CategoryManagerProps {
 export function CategoryManager({ categories, onCategoryChange }: CategoryManagerProps) {
   const [newCategory, setNewCategory] = useState("");
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to manage categories",
+        variant: "destructive",
+      });
+      navigate("/login");
+      return false;
+    }
+    return true;
+  };
 
   const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCategory.trim()) return;
+
+    const isAuthenticated = await checkAuth();
+    if (!isAuthenticated) return;
 
     try {
       const { error } = await supabase
@@ -37,17 +56,20 @@ export function CategoryManager({ categories, onCategoryChange }: CategoryManage
       
       setNewCategory("");
       onCategoryChange();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding category:', error);
       toast({
         title: "Error",
-        description: "Failed to add category",
+        description: error.message || "Failed to add category",
         variant: "destructive",
       });
     }
   };
 
   const handleDeleteCategory = async (categoryId: string) => {
+    const isAuthenticated = await checkAuth();
+    if (!isAuthenticated) return;
+
     try {
       const { error } = await supabase
         .from('categories')
@@ -62,11 +84,11 @@ export function CategoryManager({ categories, onCategoryChange }: CategoryManage
       });
       
       onCategoryChange();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting category:', error);
       toast({
         title: "Error",
-        description: "Failed to delete category",
+        description: error.message || "Failed to delete category",
         variant: "destructive",
       });
     }

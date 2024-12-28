@@ -15,6 +15,8 @@ export function useCategories() {
   const fetchCategories = async () => {
     try {
       setIsLoading(true);
+      const { data: session } = await supabase.auth.getSession();
+      
       const { data, error } = await supabase
         .from('categories')
         .select('*')
@@ -30,7 +32,7 @@ export function useCategories() {
       console.error('Error in fetchCategories:', error);
       toast({
         title: "Error",
-        description: "Failed to load categories. Please try again.",
+        description: error.message || "Failed to load categories. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -40,6 +42,17 @@ export function useCategories() {
 
   useEffect(() => {
     fetchCategories();
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        fetchCategories();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   return {

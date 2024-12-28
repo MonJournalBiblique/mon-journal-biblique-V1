@@ -45,22 +45,24 @@ export function usePosts() {
 
   const savePost = async (post: Post) => {
     try {
+      if (!post.id) {
+        throw new Error("Post ID is required");
+      }
+
       const postData = {
         id: post.id,
         title: post.title,
-        content: post.content,
+        content: post.content || '',
         published: post.published,
         date: post.date,
         author: post.author,
-        image: post.image,
-        category_id: post.categoryId // Match the database column name
+        image: post.image || null,
+        category_id: post.categoryId || null
       };
 
       const { error } = await supabase
         .from('posts')
-        .upsert(postData, {
-          onConflict: 'id'
-        });
+        .upsert(postData);
 
       if (error) throw error;
 

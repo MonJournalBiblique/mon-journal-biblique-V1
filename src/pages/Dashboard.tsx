@@ -3,7 +3,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useState } from "react";
 import { PostEditor } from "@/components/PostEditor";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { PenIcon, Trash2Icon, EyeIcon, EyeOffIcon } from "lucide-react";
+import { PenIcon, Trash2Icon, EyeIcon, EyeOffIcon, SearchIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 interface Post {
   id: string;
@@ -11,25 +13,38 @@ interface Post {
   published: boolean;
   date: string;
   author: string;
+  content?: string;
+  image?: string;
 }
 
+const POSTS_PER_PAGE = 10;
+
 const Dashboard = () => {
-  const [posts, setPosts] = useState<Post[]>([
-    {
-      id: "1",
-      title: "La Prière dans la Vie Quotidienne",
-      published: true,
-      date: "2024-02-20",
-      author: "Marie Dubois",
-    },
-    {
-      id: "2",
-      title: "L'Importance de la Foi",
-      published: false,
-      date: "2024-02-21",
-      author: "Jean Martin",
-    },
-  ]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const filteredPosts = posts.filter(post => 
+    post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    post.author.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+  const paginatedPosts = filteredPosts.slice(
+    (currentPage - 1) * POSTS_PER_PAGE,
+    currentPage * POSTS_PER_PAGE
+  );
+
+  const handleSavePost = (data: Post) => {
+    const postIndex = posts.findIndex(p => p.id === data.id);
+    if (postIndex !== -1) {
+      setPosts(posts.map((post, index) => 
+        index === postIndex ? data : post
+      ));
+    } else {
+      setPosts([data, ...posts]);
+    }
+  };
 
   const togglePublish = (postId: string) => {
     setPosts(posts.map(post => 
@@ -49,19 +64,32 @@ const Dashboard = () => {
           <SheetTrigger asChild>
             <Button>Nouveau Post</Button>
           </SheetTrigger>
-          <SheetContent className="w-[90vw] sm:max-w-2xl">
+          <SheetContent className="w-[90vw] sm:max-w-2xl overflow-y-auto">
             <SheetHeader>
               <SheetTitle>Créer un Nouveau Post</SheetTitle>
             </SheetHeader>
-            <PostEditor />
+            <PostEditor onSubmit={handleSavePost} />
           </SheetContent>
         </Sheet>
+      </div>
+
+      <div className="mb-6">
+        <div className="relative">
+          <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+          <Input
+            placeholder="Rechercher un post..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-md">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Image</TableHead>
               <TableHead>Titre</TableHead>
               <TableHead>Auteur</TableHead>
               <TableHead>Date</TableHead>
@@ -70,11 +98,20 @@ const Dashboard = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {posts.map((post) => (
+            {paginatedPosts.map((post) => (
               <TableRow key={post.id}>
+                <TableCell>
+                  {post.image && (
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="w-16 h-16 object-cover rounded"
+                    />
+                  )}
+                </TableCell>
                 <TableCell className="font-medium">{post.title}</TableCell>
                 <TableCell>{post.author}</TableCell>
-                <TableCell>{post.date}</TableCell>
+                <TableCell>{new Date(post.date).toLocaleDateString("fr-FR")}</TableCell>
                 <TableCell>
                   <Button
                     variant="ghost"
@@ -96,11 +133,11 @@ const Dashboard = () => {
                           <PenIcon className="h-4 w-4" />
                         </Button>
                       </SheetTrigger>
-                      <SheetContent className="w-[90vw] sm:max-w-2xl">
+                      <SheetContent className="w-[90vw] sm:max-w-2xl overflow-y-auto">
                         <SheetHeader>
                           <SheetTitle>Modifier le Post</SheetTitle>
                         </SheetHeader>
-                        <PostEditor post={post} />
+                        <PostEditor post={post} onSubmit={handleSavePost} />
                       </SheetContent>
                     </Sheet>
                     <Button
@@ -116,6 +153,37 @@ const Dashboard = () => {
             ))}
           </TableBody>
         </Table>
+
+        {totalPages > 1 && (
+          <div className="py-4">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                  />
+                </PaginationItem>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      onClick={() => setCurrentPage(page)}
+                      isActive={currentPage === page}
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
     </div>
   );

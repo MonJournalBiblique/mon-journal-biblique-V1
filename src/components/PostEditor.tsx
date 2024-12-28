@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { Editor } from '@tinymce/tinymce-react';
 
 interface PostEditorProps {
   post?: {
@@ -13,36 +14,55 @@ interface PostEditorProps {
     published: boolean;
     date: string;
     author: string;
+    content?: string;
+    image?: string;
   };
+  onSubmit: (data: any) => void;
 }
 
-export function PostEditor({ post }: PostEditorProps) {
+export function PostEditor({ post, onSubmit }: PostEditorProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagePreview, setImagePreview] = useState(post?.image || '');
 
   const form = useForm({
     defaultValues: {
       title: post?.title || "",
-      content: "",
+      content: post?.content || "",
       author: post?.author || "",
       published: post?.published || false,
+      image: post?.image || "",
     },
   });
 
-  const onSubmit = async (data: any) => {
+  const handleSubmit = async (data: any) => {
     setIsSubmitting(true);
     try {
-      // Here we would typically save to a backend
-      console.log("Saving post:", data);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await onSubmit({
+        ...data,
+        date: post?.date || new Date().toISOString(),
+        id: post?.id || crypto.randomUUID(),
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setImagePreview(base64String);
+        form.setValue('image', base64String);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 mt-6">
         <FormField
           control={form.control}
           name="title"
@@ -58,15 +78,55 @@ export function PostEditor({ post }: PostEditorProps) {
 
         <FormField
           control={form.control}
+          name="image"
+          render={({ field: { value, onChange, ...field } }) => (
+            <FormItem>
+              <FormLabel>Image à la une</FormLabel>
+              <FormControl>
+                <div className="space-y-4">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    {...field}
+                  />
+                  {imagePreview && (
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-full max-w-md h-48 object-cover rounded-md"
+                    />
+                  )}
+                </div>
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="content"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Contenu</FormLabel>
               <FormControl>
-                <Textarea
-                  placeholder="Écrivez votre contenu ici..."
-                  className="min-h-[200px]"
-                  {...field}
+                <Editor
+                  apiKey="your-tinymce-api-key"
+                  value={field.value}
+                  onEditorChange={(content) => field.onChange(content)}
+                  init={{
+                    height: 500,
+                    menubar: true,
+                    plugins: [
+                      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                    ],
+                    toolbar: 'undo redo | blocks | ' +
+                      'bold italic forecolor | alignleft aligncenter ' +
+                      'alignright alignjustify | bullist numlist outdent indent | ' +
+                      'removeformat | help',
+                  }}
                 />
               </FormControl>
             </FormItem>

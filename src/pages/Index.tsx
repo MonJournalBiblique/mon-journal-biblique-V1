@@ -6,8 +6,15 @@ const Index = () => {
   return (
     <div className="animate-fade-in">
       {/* Hero Section */}
-      <section className="bg-secondary py-20">
-        <div className="container">
+      <section className="bg-secondary relative min-h-[600px] flex items-center">
+        <div className="absolute inset-0">
+          <img
+            src="/placeholder.svg"
+            alt="Bible ouverte"
+            className="w-full h-full object-cover opacity-20"
+          />
+        </div>
+        <div className="container relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <BookOpen className="h-16 w-16 mx-auto mb-6 text-primary" />
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -31,7 +38,6 @@ const Index = () => {
             Articles Récents
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Sample Posts - These would be dynamic in a real application */}
             <PostCard
               title="La Prière dans la Vie Quotidienne"
               excerpt="Découvrez comment intégrer la prière dans votre routine quotidienne..."
@@ -96,8 +102,8 @@ const PostCard = ({
       </time>
       <h3 className="text-xl font-bold mb-2 mt-1">{title}</h3>
       <p className="text-gray-600 mb-4">{excerpt}</p>
-      <Button variant="link" className="p-0">
-        Lire la suite →
+      <Button variant="link" className="p-0" asChild>
+        <Link to="/blog">Lire la suite →</Link>
       </Button>
     </div>
   </article>

@@ -67,21 +67,13 @@ export default function Login() {
           }}
           providers={[]}
           redirectTo={window.location.origin}
-          onError={(error) => {
-            console.error("Auth error:", error);
-            if (error.message.includes("Email not confirmed")) {
-              toast({
-                title: "Email Not Confirmed",
-                description: "Please check your email and click the confirmation link to verify your account.",
-                variant: "destructive",
-              });
-            } else {
-              toast({
-                title: "Error",
-                description: error.message,
-                variant: "destructive",
-              });
-            }
+          localization={{
+            variables: {
+              sign_in: {
+                email_label: 'Email',
+                password_label: 'Password',
+              },
+            },
           }}
         />
       </div>

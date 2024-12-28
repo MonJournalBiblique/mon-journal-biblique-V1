@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Trash2Icon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -18,29 +18,36 @@ interface CategoryManagerProps {
 
 export function CategoryManager({ categories, onCategoryChange }: CategoryManagerProps) {
   const [newCategory, setNewCategory] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to manage categories",
-        variant: "destructive",
-      });
-      navigate("/login");
-      return false;
-    }
-    return true;
-  };
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+      if (!session) {
+        navigate("/login");
+      }
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+      if (!session) {
+        navigate("/login");
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCategory.trim()) return;
-
-    const isAuthenticated = await checkAuth();
-    if (!isAuthenticated) return;
+    if (!newCategory.trim() || !isAuthenticated) return;
 
     try {
       const { error } = await supabase
@@ -67,7 +74,6 @@ export function CategoryManager({ categories, onCategoryChange }: CategoryManage
   };
 
   const handleDeleteCategory = async (categoryId: string) => {
-    const isAuthenticated = await checkAuth();
     if (!isAuthenticated) return;
 
     try {
@@ -93,6 +99,10 @@ export function CategoryManager({ categories, onCategoryChange }: CategoryManage
       });
     }
   };
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="space-y-4">

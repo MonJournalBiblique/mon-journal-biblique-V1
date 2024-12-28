@@ -5,7 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { Editor } from '@tinymce/tinymce-react';
+import { RichTextEditor } from "./editor/RichTextEditor";
+import { ImageUpload } from "./editor/ImageUpload";
 
 interface Category {
   id: string;
@@ -112,26 +113,10 @@ export function PostEditor({ post, categories, onSubmit }: PostEditorProps) {
           control={form.control}
           name="image"
           render={({ field: { value, onChange, ...field } }) => (
-            <FormItem>
-              <FormLabel>Image à la une</FormLabel>
-              <FormControl>
-                <div className="space-y-4">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    {...field}
-                  />
-                  {imagePreview && (
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full max-w-md h-48 object-cover rounded-md"
-                    />
-                  )}
-                </div>
-              </FormControl>
-            </FormItem>
+            <ImageUpload
+              imagePreview={imagePreview}
+              onImageChange={handleImageChange}
+            />
           )}
         />
 
@@ -139,29 +124,10 @@ export function PostEditor({ post, categories, onSubmit }: PostEditorProps) {
           control={form.control}
           name="content"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Contenu</FormLabel>
-              <FormControl>
-                <Editor
-                  apiKey="kvzhkvlb9uozsltwaguv17ft2v756md2fgnt5p4gadrl0pak"
-                  value={field.value}
-                  onEditorChange={(content) => field.onChange(content)}
-                  init={{
-                    height: 500,
-                    menubar: true,
-                    plugins: [
-                      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-                    ],
-                    toolbar: 'undo redo | blocks | ' +
-                      'bold italic forecolor | alignleft aligncenter ' +
-                      'alignright alignjustify | bullist numlist outdent indent | ' +
-                      'removeformat | help',
-                  }}
-                />
-              </FormControl>
-            </FormItem>
+            <RichTextEditor
+              value={field.value}
+              onChange={(content) => field.onChange(content)}
+            />
           )}
         />
 

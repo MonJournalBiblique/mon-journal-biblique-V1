@@ -77,21 +77,12 @@ export function CategoryManager({ categories, onCategoryChange }: CategoryManage
     if (!isAuthenticated) return;
 
     try {
-      // First, update all posts that reference this category to have null category_id
-      const { error: updateError } = await supabase
-        .from('posts')
-        .update({ category_id: null })
-        .eq('category_id', categoryId);
-
-      if (updateError) throw updateError;
-
-      // Then delete the category
-      const { error: deleteError } = await supabase
+      const { error } = await supabase
         .from('categories')
         .delete()
         .eq('id', categoryId);
 
-      if (deleteError) throw deleteError;
+      if (error) throw error;
 
       toast({
         title: "Success",

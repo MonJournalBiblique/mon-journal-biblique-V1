@@ -22,12 +22,24 @@ export default function Login() {
 
     // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth event:", event);
+      
       if (event === "SIGNED_IN" && session) {
         toast({
           title: "Success",
           description: "Successfully logged in",
         });
         navigate("/");
+      } else if (event === "USER_UPDATED") {
+        toast({
+          title: "Email Confirmed",
+          description: "Your email has been confirmed. You can now log in.",
+        });
+      } else if (event === "SIGNED_OUT") {
+        toast({
+          title: "Signed Out",
+          description: "You have been signed out",
+        });
       }
     });
 
@@ -55,6 +67,22 @@ export default function Login() {
           }}
           providers={[]}
           redirectTo={window.location.origin}
+          onError={(error) => {
+            console.error("Auth error:", error);
+            if (error.message.includes("Email not confirmed")) {
+              toast({
+                title: "Email Not Confirmed",
+                description: "Please check your email and click the confirmation link to verify your account.",
+                variant: "destructive",
+              });
+            } else {
+              toast({
+                title: "Error",
+                description: error.message,
+                variant: "destructive",
+              });
+            }
+          }}
         />
       </div>
     </div>

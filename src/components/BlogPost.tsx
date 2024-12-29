@@ -21,6 +21,11 @@ const calculateReadingTime = (content: string): number => {
   return Math.ceil(wordCount / wordsPerMinute);
 };
 
+const stripHtmlTags = (html: string): string => {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return doc.body.textContent || "";
+};
+
 export const BlogPost = () => {
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,6 +52,11 @@ export const BlogPost = () => {
         });
         navigate("/blog");
         return;
+      }
+
+      // Strip HTML tags from the content preview
+      if (data) {
+        data.content = stripHtmlTags(data.content || "");
       }
 
       setPost(data);
@@ -79,7 +89,7 @@ export const BlogPost = () => {
     try {
       await navigator.share({
         title: post.title,
-        text: post.content.substring(0, 100) + "...",
+        text: stripHtmlTags(post.content).substring(0, 100) + "...",
         url: window.location.href,
       });
     } catch (err) {
@@ -99,10 +109,9 @@ export const BlogPost = () => {
           onShare={handleShare}
         />
 
-        <div
-          className="prose prose-lg prose-gray max-w-none"
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
+        <div className="prose prose-lg prose-gray dark:prose-invert max-w-none">
+          {post.content}
+        </div>
       </article>
 
       <CommentSection postId={postId || ""} />

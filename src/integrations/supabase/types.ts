@@ -33,6 +33,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          name: string
           post_id: string
         }
         Insert: {
@@ -40,6 +41,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          name: string
           post_id: string
         }
         Update: {
@@ -47,6 +49,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          name?: string
           post_id?: string
         }
         Relationships: [

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, BookOpen, Home, PenTool, ChevronDown } from "lucide-react";
+import { Menu, X, BookOpen, Home, PenTool, ChevronDown, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { useTheme } from "@/hooks/use-theme";
 
 interface Category {
   id: string;
@@ -14,6 +15,7 @@ export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [showBlogMenu, setShowBlogMenu] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -30,7 +32,7 @@ export const Navigation = () => {
   }, []);
 
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
@@ -45,20 +47,20 @@ export const Navigation = () => {
             <NavLink to="/">Accueil</NavLink>
             <div className="relative group">
               <button
-                className="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 font-medium"
+                className="flex items-center text-gray-700 dark:text-gray-300 hover:text-primary transition-colors duration-200 font-medium"
                 onClick={() => setShowBlogMenu(!showBlogMenu)}
               >
                 Blog
                 <ChevronDown className="ml-1 h-4 w-4" />
               </button>
               <div className={cn(
-                "absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-200",
+                "absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 transition-all duration-200",
                 showBlogMenu ? "opacity-100 visible" : "opacity-0 invisible"
               )}>
                 <div className="py-1">
                   <Link
                     to="/blog"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     onClick={() => setShowBlogMenu(false)}
                   >
                     All Posts
@@ -67,7 +69,7 @@ export const Navigation = () => {
                     <Link
                       key={category.id}
                       to={`/blog/category/${category.id}`}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       onClick={() => setShowBlogMenu(false)}
                     >
                       {category.name}
@@ -77,6 +79,18 @@ export const Navigation = () => {
               </div>
             </div>
             <NavLink to="/dashboard">Dashboard</NavLink>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="ml-4"
+            >
+              {theme === 'dark' ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -136,7 +150,7 @@ export const Navigation = () => {
 const NavLink = ({ to, children }: { to: string; children: React.ReactNode }) => (
   <Link
     to={to}
-    className="text-gray-700 hover:text-primary transition-colors duration-200 font-medium"
+    className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 font-medium"
   >
     {children}
   </Link>
@@ -153,7 +167,7 @@ const MobileNavLink = ({
 }) => (
   <Link
     to={to}
-    className="flex items-center text-gray-700 hover:text-primary hover:bg-secondary/50 px-3 py-2 transition-colors duration-200"
+    className="flex items-center text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800 px-3 py-2 transition-colors duration-200"
     onClick={onClick}
   >
     {children}

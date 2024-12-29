@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { MessageCircle } from "lucide-react";
@@ -12,6 +13,7 @@ interface Comment {
   author: string;
   content: string;
   created_at: string;
+  name: string;
 }
 
 interface CommentSectionProps {
@@ -21,6 +23,7 @@ interface CommentSectionProps {
 export const CommentSection = ({ postId }: CommentSectionProps) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
+  const [name, setName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -46,7 +49,14 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
   }, [postId]);
 
   const handleSubmitComment = async () => {
-    if (!newComment.trim()) return;
+    if (!newComment.trim() || !name.trim()) {
+      toast({
+        title: "Error",
+        description: "Please provide both your name and comment",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -54,6 +64,7 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
         {
           post_id: postId,
           content: newComment,
+          name: name,
           author: "Anonymous", // Replace with actual user name when auth is implemented
         },
       ]);
@@ -66,6 +77,7 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
       });
 
       setNewComment("");
+      setName("");
       
       // Refresh comments
       const { data: commentsData } = await supabase
@@ -94,6 +106,12 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
       </h2>
 
       <div className="space-y-4">
+        <Input
+          placeholder="Your name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="max-w-md"
+        />
         <Textarea
           placeholder="Add a comment..."
           value={newComment}
@@ -102,7 +120,7 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
         />
         <Button 
           onClick={handleSubmitComment}
-          disabled={isSubmitting || !newComment.trim()}
+          disabled={isSubmitting || !newComment.trim() || !name.trim()}
         >
           Publish
         </Button>
@@ -114,16 +132,16 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Avatar>
-                  <AvatarFallback>{comment.author[0]}</AvatarFallback>
+                  <AvatarFallback>{comment.name[0]}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">{comment.author}</p>
+                  <p className="font-medium">{comment.name}</p>
                   <time className="text-sm text-gray-500">
                     {new Date(comment.created_at).toLocaleDateString()}
                   </time>
                 </div>
               </div>
-              <p className="text-gray-700">{comment.content}</p>
+              <p className="text-gray-700 dark:text-gray-300">{comment.content}</p>
             </CardContent>
           </Card>
         ))}

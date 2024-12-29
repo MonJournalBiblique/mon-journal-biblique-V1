@@ -16,9 +16,9 @@ export const BlogCard = ({ id, title, content, date, image, author }: BlogCardPr
   const excerpt = content ? content.slice(0, 150) + "..." : "";
 
   return (
-    <Card className="h-full flex flex-col">
+    <Card className="h-full flex flex-col bg-white/80 backdrop-blur-sm border-none shadow-lg">
       {image && (
-        <div className="aspect-video w-full overflow-hidden">
+        <div className="aspect-video w-full overflow-hidden rounded-t-lg">
           <img
             src={image}
             alt={title}
@@ -37,12 +37,18 @@ export const BlogCard = ({ id, title, content, date, image, author }: BlogCardPr
             })}
           </time>
         </div>
-        <h3 className="text-xl font-bold mb-2">{title}</h3>
-        <p className="text-gray-600 mb-4">{excerpt}</p>
+        <h3 className="text-xl font-bold mb-2 line-clamp-2 hover:text-primary transition-colors">
+          {title}
+        </h3>
+        <p className="text-gray-600 mb-4 line-clamp-3">{excerpt}</p>
         <p className="text-sm text-gray-500">Par {author}</p>
       </CardContent>
       <CardFooter className="p-6 pt-0">
-        <Button asChild variant="outline" className="w-full">
+        <Button 
+          asChild 
+          variant="outline" 
+          className="w-full hover:bg-primary hover:text-white transition-all duration-300"
+        >
           <Link to={`/blog/${id}`}>Lire la suite</Link>
         </Button>
       </CardFooter>

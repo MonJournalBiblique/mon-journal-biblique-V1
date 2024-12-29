@@ -34,6 +34,7 @@
 
   body {
     @apply bg-background text-foreground font-sans;
+    background: linear-gradient(109.6deg, rgba(223,234,247,1) 11.2%, rgba(244,248,252,1) 91.1%);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -47,4 +48,25 @@
 
 .prose h1, .prose h2, .prose h3, .prose h4 {
   @apply font-serif;
+}
+
+/* Modern card hover effects */
+.card-hover-effect {
+  @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+}
+
+/* Modern button styles */
+.btn-modern {
+  @apply rounded-full px-6 py-3 font-medium transition-all duration-300 
+         hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0;
+}
+
+/* Gradient text effect */
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+}
+
+/* Modern container styles */
+.container-modern {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }

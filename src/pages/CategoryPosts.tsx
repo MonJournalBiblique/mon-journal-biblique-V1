@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { BlogCard } from "@/components/BlogCard";
 import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
 interface Post {
   id: string;
@@ -28,7 +29,6 @@ const CategoryPosts = () => {
     const fetchCategoryAndPosts = async () => {
       setIsLoading(true);
 
-      // Fetch category details
       const { data: categoryData } = await supabase
         .from('categories')
         .select('*')
@@ -39,7 +39,6 @@ const CategoryPosts = () => {
         setCategory(categoryData);
       }
 
-      // Fetch posts for this category
       const { data: postsData } = await supabase
         .from('posts')
         .select('*')
@@ -58,26 +57,42 @@ const CategoryPosts = () => {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-16 px-4">
-        <div className="text-center">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-16 px-4">
-      <h1 className="text-4xl font-bold text-center mb-4">
-        {category?.name || 'Category'}
-      </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
-        {posts.map((post) => (
-          <BlogCard key={post.id} {...post} />
-        ))}
-        {posts.length === 0 && (
-          <div className="col-span-full text-center text-gray-500">
-            No posts found in this category.
-          </div>
-        )}
+    <div className="min-h-screen bg-gradient-to-b from-white to-secondary/20">
+      <div className="container-modern py-16">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold gradient-text mb-4">
+            {category?.name || 'Category'}
+          </h1>
+          <div className="w-24 h-1 bg-primary mx-auto rounded-full mb-8" />
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Explore our collection of articles about {category?.name.toLowerCase()}
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+          {posts.map((post) => (
+            <div key={post.id} className="card-hover-effect">
+              <BlogCard {...post} />
+            </div>
+          ))}
+          {posts.length === 0 && (
+            <div className="col-span-full text-center py-12">
+              <div className="max-w-md mx-auto">
+                <h3 className="text-xl font-semibold mb-2">No posts found</h3>
+                <p className="text-gray-600">
+                  We haven't published any posts in this category yet. Check back soon!
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

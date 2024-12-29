@@ -16,7 +16,7 @@ export const BlogCard = ({ id, title, content, date, image, author }: BlogCardPr
   const excerpt = content ? content.slice(0, 150) + "..." : "";
 
   return (
-    <Card className="h-full flex flex-col bg-white/80 backdrop-blur-sm border-none shadow-lg">
+    <Card className="h-full flex flex-col bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-none shadow-lg">
       {image && (
         <div className="aspect-video w-full overflow-hidden rounded-t-lg">
           <img
@@ -27,7 +27,7 @@ export const BlogCard = ({ id, title, content, date, image, author }: BlogCardPr
         </div>
       )}
       <CardContent className="flex-grow p-6">
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-3">
           <Clock className="h-4 w-4" />
           <time>
             {new Date(date).toLocaleDateString("fr-FR", {
@@ -37,11 +37,11 @@ export const BlogCard = ({ id, title, content, date, image, author }: BlogCardPr
             })}
           </time>
         </div>
-        <h3 className="text-xl font-bold mb-2 line-clamp-2 hover:text-primary transition-colors">
+        <h3 className="text-xl font-bold mb-2 line-clamp-2 hover:text-primary transition-colors dark:text-white">
           {title}
         </h3>
-        <p className="text-gray-600 mb-4 line-clamp-3">{excerpt}</p>
-        <p className="text-sm text-gray-500">Par {author}</p>
+        <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">{excerpt}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Par {author}</p>
       </CardContent>
       <CardFooter className="p-6 pt-0">
         <Button 

@@ -27,7 +27,7 @@ export const PostHeader = ({
         Retour aux articles
       </Link>
 
-      <time className="text-sm text-gray-500">
+      <time className="text-sm text-gray-500 dark:text-gray-400">
         {new Date(date).toLocaleDateString("fr-FR", {
           year: "numeric",
           month: "long",
@@ -35,9 +35,9 @@ export const PostHeader = ({
         })}
       </time>
       
-      <h1 className="text-4xl font-serif font-bold mb-4">{title}</h1>
+      <h1 className="text-4xl font-serif font-bold mb-4 dark:text-white">{title}</h1>
       
-      <div className="flex items-center gap-4 text-gray-600">
+      <div className="flex items-center gap-4 text-gray-600 dark:text-gray-300">
         <div className="flex items-center gap-2">
           <Avatar>
             <AvatarFallback>{author[0]}</AvatarFallback>

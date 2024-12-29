@@ -112,7 +112,7 @@ export function CategoryManager({ categories, onCategoryChange }: CategoryManage
           value={newCategory}
           onChange={(e) => setNewCategory(e.target.value)}
           placeholder="Nom de la catégorie"
-          className="max-w-xs"
+          className="max-w-xs dark:bg-gray-800/50"
         />
         <Button type="submit">Ajouter</Button>
       </form>
@@ -121,9 +121,9 @@ export function CategoryManager({ categories, onCategoryChange }: CategoryManage
         {categories.map((category) => (
           <div
             key={category.id}
-            className="flex items-center justify-between p-3 bg-secondary rounded-lg"
+            className="flex items-center justify-between p-3 bg-secondary/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg"
           >
-            <span>{category.name}</span>
+            <span className="dark:text-white">{category.name}</span>
             <Button
               variant="ghost"
               size="sm"

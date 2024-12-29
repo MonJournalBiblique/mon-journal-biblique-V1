@@ -1,12 +1,39 @@
 import { BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Post {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  image?: string;
+}
 
 const Index = () => {
+  const [recentPosts, setRecentPosts] = useState<Post[]>([]);
+
+  useEffect(() => {
+    const fetchRecentPosts = async () => {
+      const { data } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('published', true)
+        .order('created_at', { ascending: false })
+        .limit(3);
+      
+      if (data) setRecentPosts(data);
+    };
+
+    fetchRecentPosts();
+  }, []);
+
   return (
     <div className="animate-fade-in">
       {/* Hero Section */}
-      <section className="bg-secondary relative min-h-[600px] flex items-center">
+      <section className="bg-secondary/50 dark:bg-secondary/20 relative min-h-[600px] flex items-center">
         <div className="absolute inset-0">
           <img
             src="/placeholder.svg"
@@ -20,7 +47,7 @@ const Index = () => {
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               Mon Journal Biblique
             </h1>
-            <p className="text-xl mb-8 text-gray-700">
+            <p className="text-xl mb-8 text-gray-700 dark:text-gray-300">
               Explorez la foi chrétienne à travers des réflexions profondes et des
               perspectives inspirantes.
             </p>
@@ -38,46 +65,77 @@ const Index = () => {
             Articles Récents
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <PostCard
-              title="La Prière dans la Vie Quotidienne"
-              excerpt="Découvrez comment intégrer la prière dans votre routine quotidienne..."
-              date="2024-02-20"
-            />
-            <PostCard
-              title="Comprendre les Paraboles"
-              excerpt="Une exploration approfondie des enseignements à travers les paraboles..."
-              date="2024-02-18"
-            />
-            <PostCard
-              title="La Foi en Temps de Crise"
-              excerpt="Comment maintenir et renforcer sa foi pendant les moments difficiles..."
-              date="2024-02-15"
-            />
+            {recentPosts.map((post) => (
+              <PostCard
+                key={post.id}
+                title={post.title}
+                excerpt={post.content?.replace(/<[^>]*>/g, '').substring(0, 150) + '...'}
+                date={post.date}
+                id={post.id}
+              />
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Newsletter Section */}
-      <section className="bg-primary py-16 text-white">
-        <div className="container">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-4">
-              Restez Connecté
-            </h2>
-            <p className="mb-8">
-              Recevez nos derniers articles et réflexions directement dans votre boîte mail.
-            </p>
-            <form className="flex flex-col sm:flex-row gap-4 justify-center">
-              <input
-                type="email"
-                placeholder="Votre email"
-                className="px-4 py-2 rounded-md text-gray-900 min-w-[300px]"
-              />
-              <Button variant="secondary">S'abonner</Button>
-            </form>
+      {/* Footer */}
+      <footer className="bg-background/80 dark:bg-background/80 backdrop-blur-sm border-t border-gray-200 dark:border-gray-800">
+        <div className="container mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold mb-4">À Propos</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Mon Journal Biblique est votre compagnon quotidien pour explorer et approfondir votre foi.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Liens Rapides</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/blog" className="text-gray-600 dark:text-gray-400 hover:text-primary">
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/about" className="text-gray-600 dark:text-gray-400 hover:text-primary">
+                    À Propos
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/contact" className="text-gray-600 dark:text-gray-400 hover:text-primary">
+                    Contact
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Contact</h3>
+              <ul className="space-y-2 text-gray-600 dark:text-gray-400">
+                <li>Email: contact@monjournalbiblique.com</li>
+                <li>Téléphone: +33 1 23 45 67 89</li>
+                <li>Adresse: Paris, France</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Suivez-nous</h3>
+              <div className="flex space-x-4">
+                <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary">
+                  Facebook
+                </a>
+                <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary">
+                  Twitter
+                </a>
+                <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary">
+                  Instagram
+                </a>
+              </div>
+            </div>
+          </div>
+          <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800 text-center text-gray-600 dark:text-gray-400">
+            <p>© {new Date().getFullYear()} Mon Journal Biblique. Tous droits réservés.</p>
           </div>
         </div>
-      </section>
+      </footer>
     </div>
   );
 };
@@ -86,14 +144,16 @@ const PostCard = ({
   title,
   excerpt,
   date,
+  id,
 }: {
   title: string;
   excerpt: string;
   date: string;
+  id: string;
 }) => (
-  <article className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
+  <article className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
     <div className="p-6">
-      <time className="text-sm text-gray-500">
+      <time className="text-sm text-gray-500 dark:text-gray-400">
         {new Date(date).toLocaleDateString("fr-FR", {
           year: "numeric",
           month: "long",
@@ -101,9 +161,9 @@ const PostCard = ({
         })}
       </time>
       <h3 className="text-xl font-bold mb-2 mt-1">{title}</h3>
-      <p className="text-gray-600 mb-4">{excerpt}</p>
+      <p className="text-gray-600 dark:text-gray-300 mb-4">{excerpt}</p>
       <Button variant="link" className="p-0" asChild>
-        <Link to="/blog">Lire la suite →</Link>
+        <Link to={`/blog/${id}`}>Lire la suite →</Link>
       </Button>
     </div>
   </article>

@@ -13,11 +13,6 @@ export type ThemeName =
   | 'bordeauxGray'
   | 'blackAndWhite';
 
-interface ThemeState {
-  currentTheme: ThemeName;
-  setTheme: (theme: ThemeName) => void;
-}
-
 export const themes = {
   purple: {
     primary100: '#6c35de',
@@ -141,14 +136,50 @@ export const themes = {
   },
 };
 
+interface ThemeState {
+  currentTheme: ThemeName;
+  setTheme: (theme: ThemeName) => void;
+}
+
 export const useSiteTheme = create<ThemeState>()(
   persist(
     (set) => ({
       currentTheme: 'purple',
-      setTheme: (theme) => set({ currentTheme: theme }),
+      setTheme: (theme) => {
+        set({ currentTheme: theme });
+        const selectedTheme = themes[theme];
+        
+        // Update CSS variables
+        document.documentElement.style.setProperty('--primary-100', selectedTheme.primary100);
+        document.documentElement.style.setProperty('--primary-200', selectedTheme.primary200);
+        document.documentElement.style.setProperty('--primary-300', selectedTheme.primary300);
+        document.documentElement.style.setProperty('--accent-100', selectedTheme.accent100);
+        document.documentElement.style.setProperty('--accent-200', selectedTheme.accent200);
+        document.documentElement.style.setProperty('--text-100', selectedTheme.text100);
+        document.documentElement.style.setProperty('--text-200', selectedTheme.text200);
+        document.documentElement.style.setProperty('--bg-100', selectedTheme.bg100);
+        document.documentElement.style.setProperty('--bg-200', selectedTheme.bg200);
+        document.documentElement.style.setProperty('--bg-300', selectedTheme.bg300);
+      },
     }),
     {
       name: 'site-theme',
+      onRehydrateStorage: () => (state) => {
+        // Apply theme when storage is rehydrated
+        if (state) {
+          const selectedTheme = themes[state.currentTheme];
+          document.documentElement.style.setProperty('--primary-100', selectedTheme.primary100);
+          document.documentElement.style.setProperty('--primary-200', selectedTheme.primary200);
+          document.documentElement.style.setProperty('--primary-300', selectedTheme.primary300);
+          document.documentElement.style.setProperty('--accent-100', selectedTheme.accent100);
+          document.documentElement.style.setProperty('--accent-200', selectedTheme.accent200);
+          document.documentElement.style.setProperty('--text-100', selectedTheme.text100);
+          document.documentElement.style.setProperty('--text-200', selectedTheme.text200);
+          document.documentElement.style.setProperty('--bg-100', selectedTheme.bg100);
+          document.documentElement.style.setProperty('--bg-200', selectedTheme.bg200);
+          document.documentElement.style.setProperty('--bg-300', selectedTheme.bg300);
+        }
+      },
     }
   )
 );

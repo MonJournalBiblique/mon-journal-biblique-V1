@@ -11,6 +11,7 @@ import { BlogPost } from "@/components/BlogPost";
 import { useEffect, useState } from "react";
 import "@/i18n/config";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface VisibilityState {
   about: boolean;
@@ -31,6 +32,8 @@ function App() {
     categories: true,
   });
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     const storedVisibility = localStorage.getItem('frontendVisibility');
@@ -39,9 +42,29 @@ function App() {
     }
 
     const checkAdminStatus = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setIsAdmin(ADMIN_EMAILS.includes(session.user.email || ''));
+      try {
+        setIsLoading(true);
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Auth error:', error);
+          toast({
+            title: "Authentication Error",
+            description: "Please try logging in again",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (session?.user) {
+          setIsAdmin(ADMIN_EMAILS.includes(session.user.email || ''));
+        } else {
+          setIsAdmin(false);
+        }
+      } catch (error) {
+        console.error('Session check error:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -59,11 +82,13 @@ function App() {
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
-        setIsAdmin(ADMIN_EMAILS.includes(session.user.email || ''));
-      } else {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_OUT') {
         setIsAdmin(false);
+        // Clear any stored auth data
+        localStorage.removeItem('supabase.auth.token');
+      } else if (session?.user) {
+        setIsAdmin(ADMIN_EMAILS.includes(session.user.email || ''));
       }
     });
 
@@ -71,7 +96,11 @@ function App() {
       subscription.unsubscribe();
       window.removeEventListener('visibilityChange', handleVisibilityChange as EventListener);
     };
-  }, []);
+  }, [toast]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Router>

@@ -33,40 +33,33 @@ const Index = () => {
   return (
     <div className="animate-fade-in">
       {/* Hero Section */}
-      <section className="relative min-h-screen">
-        {/* Background Image */}
+      <section className="bg-secondary/50 dark:bg-secondary/20 relative min-h-[600px] flex items-center">
         <div className="absolute inset-0">
           <img
-            src="/lovable-uploads/5719ca2e-3616-4c8e-a38d-398b80fa773c.png"
-            alt="Hero background"
-            className="w-full h-full object-cover"
+            src="/placeholder.svg"
+            alt="Bible ouverte"
+            className="w-full h-full object-cover opacity-20"
           />
-          <div className="absolute inset-0 bg-black/50" /> {/* Dark overlay */}
         </div>
-
-        {/* Hero Content */}
-        <div className="relative z-10 container mx-auto px-4 h-screen flex flex-col justify-center items-center text-center text-white">
-          <div className="space-y-6 max-w-3xl">
-            <span className="text-sm uppercase tracking-wider">TRAVEL</span>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold">
-              Two inspired stories about Morning
+        <div className="container relative z-10">
+          <div className="max-w-3xl mx-auto text-center">
+            <BookOpen className="h-16 w-16 mx-auto mb-6 text-primary" />
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              Mon Journal Biblique
             </h1>
-            <p className="text-lg text-gray-200">
-              MAY 10, 2016
+            <p className="text-xl mb-8 text-gray-700 dark:text-gray-300">
+              Explorez la foi chrétienne à travers des réflexions profondes et des
+              perspectives inspirantes.
             </p>
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="bg-transparent border-white text-white hover:bg-white hover:text-black transition-all mt-8"
-            >
-              READ MORE
+            <Button asChild size="lg">
+              <Link to="/blog">Découvrir les Articles</Link>
             </Button>
           </div>
         </div>
       </section>
 
       {/* Featured Posts */}
-      <section className="py-16 bg-background dark:bg-background">
+      <section className="py-16">
         <div className="container">
           <h2 className="text-3xl font-bold mb-8 text-center">
             Articles Récents
@@ -86,59 +79,59 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-background/80 dark:bg-gray-900/80 backdrop-blur-sm border-t border-gray-200 dark:border-gray-800">
+      <footer className="bg-background/80 dark:bg-background/80 backdrop-blur-sm border-t border-gray-200 dark:border-gray-800">
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4 dark:text-white">À Propos</h3>
-              <p className="text-gray-600 dark:text-gray-300">
+              <h3 className="text-lg font-semibold mb-4">À Propos</h3>
+              <p className="text-gray-600 dark:text-gray-400">
                 Mon Journal Biblique est votre compagnon quotidien pour explorer et approfondir votre foi.
               </p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4 dark:text-white">Liens Rapides</h3>
+              <h3 className="text-lg font-semibold mb-4">Liens Rapides</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/blog" className="text-gray-600 dark:text-gray-300 hover:text-primary">
+                  <Link to="/blog" className="text-gray-600 dark:text-gray-400 hover:text-primary">
                     Blog
                   </Link>
                 </li>
                 <li>
-                  <Link to="/about" className="text-gray-600 dark:text-gray-300 hover:text-primary">
+                  <Link to="/about" className="text-gray-600 dark:text-gray-400 hover:text-primary">
                     À Propos
                   </Link>
                 </li>
                 <li>
-                  <Link to="/contact" className="text-gray-600 dark:text-gray-300 hover:text-primary">
+                  <Link to="/contact" className="text-gray-600 dark:text-gray-400 hover:text-primary">
                     Contact
                   </Link>
                 </li>
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4 dark:text-white">Contact</h3>
-              <ul className="space-y-2 text-gray-600 dark:text-gray-300">
+              <h3 className="text-lg font-semibold mb-4">Contact</h3>
+              <ul className="space-y-2 text-gray-600 dark:text-gray-400">
                 <li>Email: contact@monjournalbiblique.com</li>
                 <li>Téléphone: +33 1 23 45 67 89</li>
                 <li>Adresse: Paris, France</li>
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4 dark:text-white">Suivez-nous</h3>
+              <h3 className="text-lg font-semibold mb-4">Suivez-nous</h3>
               <div className="flex space-x-4">
-                <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary">
+                <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary">
                   Facebook
                 </a>
-                <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary">
+                <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary">
                   Twitter
                 </a>
-                <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary">
+                <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary">
                   Instagram
                 </a>
               </div>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800 text-center text-gray-600 dark:text-gray-300">
+          <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800 text-center text-gray-600 dark:text-gray-400">
             <p>© {new Date().getFullYear()} Mon Journal Biblique. Tous droits réservés.</p>
           </div>
         </div>
@@ -167,9 +160,9 @@ const PostCard = ({
           day: "numeric",
         })}
       </time>
-      <h3 className="text-xl font-bold mb-2 mt-1 dark:text-white">{title}</h3>
+      <h3 className="text-xl font-bold mb-2 mt-1">{title}</h3>
       <p className="text-gray-600 dark:text-gray-300 mb-4">{excerpt}</p>
-      <Button variant="link" className="p-0 dark:text-white" asChild>
+      <Button variant="link" className="p-0" asChild>
         <Link to={`/blog/${id}`}>Lire la suite →</Link>
       </Button>
     </div>

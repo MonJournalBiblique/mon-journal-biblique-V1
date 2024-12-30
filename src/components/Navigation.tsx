@@ -11,11 +11,23 @@ interface Category {
   name: string;
 }
 
+// Add visibility state interface
+interface VisibilityState {
+  about: boolean;
+  contact: boolean;
+  categories: boolean;
+}
+
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [showBlogMenu, setShowBlogMenu] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const [visibility, setVisibility] = useState<VisibilityState>({
+    about: true,
+    contact: true,
+    categories: true,
+  });
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -28,8 +40,22 @@ export const Navigation = () => {
       if (data) setCategories(data);
     };
 
+    // Fetch visibility settings from localStorage
+    const storedVisibility = localStorage.getItem('dashboardVisibility');
+    if (storedVisibility) {
+      setVisibility(JSON.parse(storedVisibility));
+    }
+
     fetchCategories();
   }, []);
+
+  // Only show navigation items if they're visible
+  const navItems = [
+    { path: "/", label: "Accueil", icon: Home, alwaysShow: true },
+    { path: "/about", label: "À Propos", icon: Info, showIf: visibility.about },
+    { path: "/contact", label: "Contact", icon: Mail, showIf: visibility.contact },
+    { path: "/dashboard", label: "Dashboard", icon: PenTool, alwaysShow: true },
+  ].filter(item => item.alwaysShow || item.showIf);
 
   return (
     <nav className="bg-background/40 dark:bg-background/40 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50">
@@ -44,15 +70,21 @@ export const Navigation = () => {
 
           {/* Desktop Menu */}
           <div className="hidden sm:flex sm:items-center sm:space-x-8">
-            <NavLink to="/">Accueil</NavLink>
+            {navItems.map((item) => (
+              <NavLink key={item.path} to={item.path}>
+                {item.label}
+              </NavLink>
+            ))}
             <div className="relative group">
-              <button
-                className="flex items-center text-gray-700 dark:text-gray-300 hover:text-primary transition-colors duration-200 font-medium"
-                onClick={() => setShowBlogMenu(!showBlogMenu)}
-              >
-                Blog
-                <ChevronDown className="ml-1 h-4 w-4" />
-              </button>
+              {visibility.categories && (
+                <button
+                  className="flex items-center text-gray-700 dark:text-gray-300 hover:text-primary transition-colors duration-200 font-medium"
+                  onClick={() => setShowBlogMenu(!showBlogMenu)}
+                >
+                  Blog
+                  <ChevronDown className="ml-1 h-4 w-4" />
+                </button>
+              )}
               <div className={cn(
                 "absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 transition-all duration-200",
                 showBlogMenu ? "opacity-100 visible" : "opacity-0 invisible"
@@ -78,9 +110,6 @@ export const Navigation = () => {
                 </div>
               </div>
             </div>
-            <NavLink to="/about">À Propos</NavLink>
-            <NavLink to="/contact">Contact</NavLink>
-            <NavLink to="/dashboard">Dashboard</NavLink>
             <Button
               variant="ghost"
               size="icon"
@@ -114,22 +143,19 @@ export const Navigation = () => {
       </div>
 
       {/* Mobile Menu */}
-      <div
-        className={cn(
-          "sm:hidden",
-          isOpen ? "block" : "hidden"
-        )}
-      >
+      <div className={cn("sm:hidden", isOpen ? "block" : "hidden")}>
         <div className="pt-2 pb-3 space-y-1">
-          <MobileNavLink to="/" onClick={toggleMenu}>
-            <Home className="h-5 w-5 mr-2" />
-            Accueil
-          </MobileNavLink>
-          <MobileNavLink to="/blog" onClick={toggleMenu}>
-            <BookOpen className="h-5 w-5 mr-2" />
-            All Posts
-          </MobileNavLink>
-          {categories.map(category => (
+          {navItems.map((item) => (
+            <MobileNavLink
+              key={item.path}
+              to={item.path}
+              onClick={toggleMenu}
+            >
+              <item.icon className="h-5 w-5 mr-2" />
+              {item.label}
+            </MobileNavLink>
+          ))}
+          {visibility.categories && categories.map(category => (
             <MobileNavLink
               key={category.id}
               to={`/blog/category/${category.id}`}
@@ -139,18 +165,6 @@ export const Navigation = () => {
               {category.name}
             </MobileNavLink>
           ))}
-          <MobileNavLink to="/about" onClick={toggleMenu}>
-            <Info className="h-5 w-5 mr-2" />
-            À Propos
-          </MobileNavLink>
-          <MobileNavLink to="/contact" onClick={toggleMenu}>
-            <Mail className="h-5 w-5 mr-2" />
-            Contact
-          </MobileNavLink>
-          <MobileNavLink to="/dashboard" onClick={toggleMenu}>
-            <PenTool className="h-5 w-5 mr-2" />
-            Dashboard
-          </MobileNavLink>
         </div>
       </div>
     </nav>

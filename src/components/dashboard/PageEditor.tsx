@@ -13,13 +13,23 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tables } from "@/integrations/supabase/types";
+import { useForm } from "react-hook-form";
+import { Form, FormField, FormItem } from "@/components/ui/form";
 
 type Page = Tables<'pages'>
+
+interface PageForm {
+  content: string;
+}
 
 export const PageEditor = ({ slug }: { slug: string }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [content, setContent] = useState("");
+  const form = useForm<PageForm>({
+    defaultValues: {
+      content: "",
+    },
+  });
 
   const { data: page, isLoading } = useQuery({
     queryKey: ['pages', slug],
@@ -31,16 +41,16 @@ export const PageEditor = ({ slug }: { slug: string }) => {
         .single();
       
       if (error) throw error;
-      setContent(data.content || '');
+      form.reset({ content: data.content || '' });
       return data as Page;
     },
   });
 
   const updatePage = useMutation({
-    mutationFn: async (newContent: string) => {
+    mutationFn: async (content: string) => {
       const { error } = await supabase
         .from('pages')
-        .update({ content: newContent, last_updated: new Date().toISOString() })
+        .update({ content, last_updated: new Date().toISOString() })
         .eq('slug', slug);
       
       if (error) throw error;
@@ -61,6 +71,10 @@ export const PageEditor = ({ slug }: { slug: string }) => {
       console.error('Error updating page:', error);
     },
   });
+
+  const onSubmit = (data: PageForm) => {
+    updatePage.mutate(data.content);
+  };
 
   if (isLoading) {
     return (
@@ -85,16 +99,28 @@ export const PageEditor = ({ slug }: { slug: string }) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <RichTextEditor
-          value={content}
-          onChange={(newContent) => setContent(newContent)}
-        />
-        <Button 
-          onClick={() => updatePage.mutate(content)}
-          disabled={updatePage.isPending}
-        >
-          {updatePage.isPending ? "Enregistrement..." : "Enregistrer"}
-        </Button>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="content"
+              render={({ field }) => (
+                <FormItem>
+                  <RichTextEditor
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormItem>
+              )}
+            />
+            <Button 
+              type="submit"
+              disabled={updatePage.isPending}
+            >
+              {updatePage.isPending ? "Enregistrement..." : "Enregistrer"}
+            </Button>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );

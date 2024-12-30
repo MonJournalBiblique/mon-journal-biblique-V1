@@ -8,16 +8,21 @@ import CategoryPosts from "@/pages/CategoryPosts";
 import Dashboard from "@/pages/Dashboard";
 import Login from "@/pages/Login";
 import { BlogPost } from "@/components/BlogPost";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "@/i18n/config";
-import { AuthProvider } from "@/components/providers/AuthProvider";
-import { RealtimeProvider } from "@/components/providers/RealtimeProvider";
+import { supabase } from "@/integrations/supabase/client";
 
 interface VisibilityState {
   about: boolean;
   contact: boolean;
   categories: boolean;
 }
+
+const ADMIN_EMAILS = [
+  'michele.pouobang@gmail.com',
+  'kamguiac@gmail.com',
+  'guy.christian.kamguia@gmail.com'
+];
 
 function App() {
   const [visibility, setVisibility] = useState<VisibilityState>({
@@ -27,36 +32,72 @@ function App() {
   });
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // Keep-alive effect
+  useEffect(() => {
+    const keepAlive = setInterval(() => {
+      fetch(window.location.href).catch(() => {
+        // Silent catch
+      });
+    }, 240000); // 4 minutes
+
+    return () => clearInterval(keepAlive);
+  }, []);
+
+  // Original authentication effect
+  useEffect(() => {
+    const storedVisibility = localStorage.getItem('frontendVisibility');
+    if (storedVisibility) {
+      setVisibility(JSON.parse(storedVisibility));
+    }
+
+    const checkAdminStatus = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setIsAdmin(ADMIN_EMAILS.includes(session.user.email || ''));
+      }
+    };
+
+    checkAdminStatus();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setIsAdmin(ADMIN_EMAILS.includes(session.user.email || ''));
+      } else {
+        setIsAdmin(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   return (
     <Router>
-      <AuthProvider onAuthChange={setIsAdmin}>
-        <RealtimeProvider>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/:id" element={<BlogPost />} />
-              <Route 
-                path="/blog/category/:categoryId" 
-                element={visibility.categories ? <CategoryPosts /> : <Navigate to="/" />} 
-              />
-              <Route 
-                path="/about" 
-                element={visibility.about ? <About /> : <Navigate to="/" />} 
-              />
-              <Route 
-                path="/contact" 
-                element={visibility.contact ? <Contact /> : <Navigate to="/" />} 
-              />
-              <Route 
-                path="/dashboard" 
-                element={isAdmin ? <Dashboard /> : <Navigate to="/" />} 
-              />
-              <Route path="/login" element={<Login />} />
-            </Routes>
-          </Layout>
-        </RealtimeProvider>
-      </AuthProvider>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<BlogPost />} />
+          <Route 
+            path="/blog/category/:categoryId" 
+            element={visibility.categories ? <CategoryPosts /> : <Navigate to="/" />} 
+          />
+          <Route 
+            path="/about" 
+            element={visibility.about ? <About /> : <Navigate to="/" />} 
+          />
+          <Route 
+            path="/contact" 
+            element={visibility.contact ? <Contact /> : <Navigate to="/" />} 
+          />
+          <Route 
+            path="/dashboard" 
+            element={isAdmin ? <Dashboard /> : <Navigate to="/" />} 
+          />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </Layout>
     </Router>
   );
 }

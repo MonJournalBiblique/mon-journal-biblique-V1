@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, BookOpen, Home, Info, Mail, Shield } from "lucide-react";
+import { Menu, X, BookOpen, Home, Info, Mail, Shield, LogIn, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
@@ -8,6 +8,7 @@ import { NavLink } from "./navigation/NavLink";
 import { MobileNavLink } from "./navigation/MobileNavLink";
 import { LanguageSwitcher } from "./navigation/LanguageSwitcher";
 import { BlogMenu } from "./navigation/BlogMenu";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Category {
   id: string;
@@ -30,7 +31,9 @@ export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [visibility, setVisibility] = useState<VisibilityState>({
     about: true,
     contact: true,
@@ -38,6 +41,14 @@ export const Navigation = () => {
   });
 
   const toggleMenu = () => setIsOpen(!isOpen);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast({
+      title: "Déconnexion réussie",
+      description: "Vous avez été déconnecté avec succès",
+    });
+  };
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -51,7 +62,11 @@ export const Navigation = () => {
     const checkAdminStatus = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
+        setIsAuthenticated(true);
         setIsAdmin(ADMIN_EMAILS.includes(session.user.email || ''));
+      } else {
+        setIsAuthenticated(false);
+        setIsAdmin(false);
       }
     };
 
@@ -63,11 +78,12 @@ export const Navigation = () => {
     fetchCategories();
     checkAdminStatus();
 
-    // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
+        setIsAuthenticated(true);
         setIsAdmin(ADMIN_EMAILS.includes(session.user.email || ''));
       } else {
+        setIsAuthenticated(false);
         setIsAdmin(false);
       }
     });
@@ -113,6 +129,29 @@ export const Navigation = () => {
             
             <BlogMenu categories={categories} isVisible={visibility.categories} />
             <LanguageSwitcher />
+            
+            {isAuthenticated ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="flex items-center gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="sr-only">Logout</span>
+              </Button>
+            ) : (
+              <Link to="/login">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <LogIn className="h-4 w-4" />
+                  <span className="sr-only">Login</span>
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -156,6 +195,26 @@ export const Navigation = () => {
               {category.name}
             </MobileNavLink>
           ))}
+          {isAuthenticated ? (
+            <MobileNavLink
+              to="#"
+              onClick={() => {
+                handleLogout();
+                toggleMenu();
+              }}
+            >
+              <LogOut className="h-5 w-5 mr-2" />
+              Déconnexion
+            </MobileNavLink>
+          ) : (
+            <MobileNavLink
+              to="/login"
+              onClick={toggleMenu}
+            >
+              <LogIn className="h-5 w-5 mr-2" />
+              Connexion
+            </MobileNavLink>
+          )}
         </div>
       </div>
     </nav>

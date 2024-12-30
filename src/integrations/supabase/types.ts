@@ -89,6 +89,32 @@ export type Database = {
         }
         Relationships: []
       }
+      post_duplications: {
+        Row: {
+          created_at: string | null
+          id: string
+          original_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          original_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          original_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_duplications_original_id_fkey"
+            columns: ["original_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           author: string

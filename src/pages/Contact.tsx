@@ -30,12 +30,20 @@ const Contact = () => {
   }
 
   return (
-    <div className="container mx-auto py-12 px-4">
-      <h1 className="text-4xl font-serif font-bold text-primary mb-8">{page?.title}</h1>
-      <div 
-        className="prose dark:prose-invert max-w-none"
-        dangerouslySetInnerHTML={{ __html: page?.content || '' }}
-      />
+    <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">
+      <div className="container mx-auto py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-4xl sm:text-5xl font-serif font-bold text-primary mb-8 text-center">
+            {page?.title}
+          </h1>
+          <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-lg p-8 sm:p-10">
+            <div 
+              className="prose dark:prose-invert max-w-none"
+              dangerouslySetInnerHTML={{ __html: page?.content || '' }}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

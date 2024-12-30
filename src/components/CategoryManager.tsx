@@ -5,6 +5,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2Icon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Category {
   id: string;
@@ -19,6 +29,7 @@ interface CategoryManagerProps {
 export function CategoryManager({ categories, onCategoryChange }: CategoryManagerProps) {
   const [newCategory, setNewCategory] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -74,13 +85,17 @@ export function CategoryManager({ categories, onCategoryChange }: CategoryManage
   };
 
   const handleDeleteCategory = async (categoryId: string) => {
-    if (!isAuthenticated) return;
+    setCategoryToDelete(categoryId);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (!categoryToDelete || !isAuthenticated) return;
 
     try {
       const { error } = await supabase
         .from('categories')
         .delete()
-        .eq('id', categoryId);
+        .eq('id', categoryToDelete);
 
       if (error) throw error;
 
@@ -97,6 +112,8 @@ export function CategoryManager({ categories, onCategoryChange }: CategoryManage
         description: error.message || "Failed to delete category",
         variant: "destructive",
       });
+    } finally {
+      setCategoryToDelete(null);
     }
   };
 
@@ -105,7 +122,7 @@ export function CategoryManager({ categories, onCategoryChange }: CategoryManage
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <form onSubmit={handleAddCategory} className="flex gap-2">
         <Input
           type="text"
@@ -117,23 +134,39 @@ export function CategoryManager({ categories, onCategoryChange }: CategoryManage
         <Button type="submit">Ajouter</Button>
       </form>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {categories.map((category) => (
           <div
             key={category.id}
-            className="flex items-center justify-between p-3 bg-secondary/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg"
+            className="flex items-center justify-between p-6 bg-secondary/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-secondary dark:border-gray-700"
           >
-            <span className="dark:text-white">{category.name}</span>
+            <span className="text-lg font-medium dark:text-white">{category.name}</span>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => handleDeleteCategory(category.id)}
+              className="hover:bg-red-100 dark:hover:bg-red-900/20"
             >
               <Trash2Icon className="h-4 w-4 text-red-500" />
             </Button>
           </div>
         ))}
       </div>
+
+      <AlertDialog open={!!categoryToDelete} onOpenChange={() => setCategoryToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer cette catégorie ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. La catégorie sera définitivement supprimée.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setCategoryToDelete(null)}>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirmed}>Supprimer</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

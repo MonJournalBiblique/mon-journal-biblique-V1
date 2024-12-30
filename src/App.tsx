@@ -68,7 +68,31 @@ function App() {
       }
     };
 
-    checkAdminStatus();
+    // Subscribe to real-time changes for footer_content
+    const footerChannel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'footer_content' },
+        (payload) => {
+          console.log('Footer content changed:', payload);
+          window.dispatchEvent(new Event('footer-update'));
+        }
+      )
+      .subscribe();
+
+    // Subscribe to real-time changes for pages
+    const pagesChannel = supabase
+      .channel('pages-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'pages' },
+        (payload) => {
+          console.log('Pages content changed:', payload);
+          window.dispatchEvent(new Event('pages-update'));
+        }
+      )
+      .subscribe();
 
     const handleVisibilityChange = (event: Event) => {
       const customEvent = event as CustomEvent<VisibilityState>;
@@ -85,7 +109,6 @@ function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
         setIsAdmin(false);
-        // Clear any stored auth data
         localStorage.removeItem('supabase.auth.token');
       } else if (session?.user) {
         setIsAdmin(ADMIN_EMAILS.includes(session.user.email || ''));
@@ -94,6 +117,8 @@ function App() {
 
     return () => {
       subscription.unsubscribe();
+      supabase.removeChannel(footerChannel);
+      supabase.removeChannel(pagesChannel);
       window.removeEventListener('visibilityChange', handleVisibilityChange as EventListener);
     };
   }, [toast]);

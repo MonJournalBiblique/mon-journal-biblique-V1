@@ -25,24 +25,31 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   });
   const { t } = useTranslation();
 
+  const fetchFooterContent = async () => {
+    const { data } = await supabase
+      .from('footer_content')
+      .select('*')
+      .single();
+
+    if (data) {
+      setFooterContent(data);
+    }
+  };
+
   useEffect(() => {
-    const fetchFooterContent = async () => {
-      const { data } = await supabase
-        .from('footer_content')
-        .select('*')
-        .single();
-
-      if (data) {
-        setFooterContent(data);
-      }
-    };
-
     const storedVisibility = localStorage.getItem('footerVisibility');
     if (storedVisibility) {
       setVisibility(JSON.parse(storedVisibility));
     }
 
     fetchFooterContent();
+
+    // Listen for footer content updates
+    window.addEventListener('footer-update', fetchFooterContent);
+
+    return () => {
+      window.removeEventListener('footer-update', fetchFooterContent);
+    };
   }, []);
 
   return (

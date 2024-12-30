@@ -16,7 +16,18 @@
     "by": "BY",
     "publishedPosts": "Published Posts",
     "noPostsFound": "No posts found",
-    "checkBack": "Check back soon for new content!"
+    "checkBack": "Check back soon for new content!",
+    "backToArticles": "Back to articles",
+    "share": "Share",
+    "publish": "Publish",
+    "readingTime": "min read",
+    "comments": "Comments",
+    "addComment": "Add a comment",
+    "yourName": "Your name",
+    "submitComment": "Submit",
+    "translateContent": "Translate Content",
+    "originalContent": "Original Content",
+    "gridView": "Grid View"
   },
   "footer": {
     "about": "About",

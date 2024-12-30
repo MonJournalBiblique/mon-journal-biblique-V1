@@ -16,7 +16,18 @@
     "by": "PAR",
     "publishedPosts": "Articles Publiés",
     "noPostsFound": "Aucun article trouvé",
-    "checkBack": "Revenez bientôt pour du nouveau contenu !"
+    "checkBack": "Revenez bientôt pour du nouveau contenu !",
+    "backToArticles": "Retour aux articles",
+    "share": "Partager",
+    "publish": "Publier",
+    "readingTime": "min de lecture",
+    "comments": "Commentaires",
+    "addComment": "Ajouter un commentaire",
+    "yourName": "Votre nom",
+    "submitComment": "Envoyer",
+    "translateContent": "Traduire le Contenu",
+    "originalContent": "Contenu Original",
+    "gridView": "Vue en Grille"
   },
   "footer": {
     "about": "À Propos",

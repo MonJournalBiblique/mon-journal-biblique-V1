@@ -2,6 +2,9 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
+import { Languages } from "lucide-react";
 
 interface BlogCardProps {
   id: string;
@@ -15,6 +18,9 @@ interface BlogCardProps {
 
 export const BlogCard = ({ id, title, content, date, image, author, category_id }: BlogCardProps) => {
   const [categoryName, setCategoryName] = useState<string>("");
+  const [translatedContent, setTranslatedContent] = useState<string | null>(null);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const fetchCategory = async () => {
@@ -34,6 +40,22 @@ export const BlogCard = ({ id, title, content, date, image, author, category_id 
     fetchCategory();
   }, [category_id]);
 
+  const translateContent = async () => {
+    if (isTranslating) return;
+    
+    setIsTranslating(true);
+    try {
+      const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${i18n.language}&dt=t&q=${encodeURIComponent(content)}`);
+      const data = await response.json();
+      const translatedText = data[0].map((item: any[]) => item[0]).join(' ');
+      setTranslatedContent(translatedText);
+    } catch (error) {
+      console.error('Translation error:', error);
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
   return (
     <Card className="group overflow-hidden border-none bg-transparent">
       <div className="relative aspect-[4/3] overflow-hidden rounded-lg mb-4">
@@ -41,6 +63,7 @@ export const BlogCard = ({ id, title, content, date, image, author, category_id 
           src={image || "/placeholder.svg"}
           alt={title}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
@@ -57,11 +80,11 @@ export const BlogCard = ({ id, title, content, date, image, author, category_id 
         </Link>
         <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
           <div className="flex items-center gap-2">
-            <span>BY</span>
+            <span>{t('blog.by')}</span>
             <span className="font-medium">{author}</span>
           </div>
           <time>
-            {new Date(date).toLocaleDateString("fr-FR", {
+            {new Date(date).toLocaleDateString(i18n.language, {
               year: "numeric",
               month: "long",
               day: "numeric",
@@ -69,15 +92,27 @@ export const BlogCard = ({ id, title, content, date, image, author, category_id 
           </time>
         </div>
         <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-          {content?.replace(/<[^>]*>/g, '')}
+          {translatedContent || content?.replace(/<[^>]*>/g, '')}
         </p>
-        <Link 
-          to={`/blog/${id}`}
-          className="inline-block px-6 py-2 bg-white text-primary border-2 border-primary rounded 
-                   hover:bg-primary hover:text-white transition-all duration-300"
-        >
-          READ MORE
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link 
+            to={`/blog/${id}`}
+            className="inline-block px-6 py-2 bg-white text-primary border-2 border-primary rounded 
+                     hover:bg-primary hover:text-white transition-all duration-300"
+          >
+            {t('blog.readMore')}
+          </Link>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={translateContent}
+            disabled={isTranslating}
+            className="flex items-center gap-2"
+          >
+            <Languages className="w-4 h-4" />
+            {translatedContent ? t('blog.originalContent') : t('blog.translateContent')}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

@@ -5,6 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { PostHeader } from "./blog/PostHeader";
 import { CommentSection } from "./blog/CommentSection";
 import { RelatedPosts } from "./blog/RelatedPosts";
+import { useTranslation } from "react-i18next";
+import { Button } from "./ui/button";
+import { Languages } from "lucide-react";
 
 interface Post {
   id: string;
@@ -29,9 +32,12 @@ const stripHtmlTags = (html: string): string => {
 export const BlogPost = () => {
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [translatedContent, setTranslatedContent] = useState<string | null>(null);
+  const [isTranslating, setIsTranslating] = useState(false);
   const { id: postId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -54,7 +60,6 @@ export const BlogPost = () => {
         return;
       }
 
-      // Strip HTML tags from the content preview
       if (data) {
         data.content = stripHtmlTags(data.content || "");
       }
@@ -65,6 +70,27 @@ export const BlogPost = () => {
 
     fetchPost();
   }, [postId, navigate, toast]);
+
+  const translateContent = async () => {
+    if (!post || isTranslating) return;
+    
+    setIsTranslating(true);
+    try {
+      const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${i18n.language}&dt=t&q=${encodeURIComponent(post.content)}`);
+      const data = await response.json();
+      const translatedText = data[0].map((item: any[]) => item[0]).join(' ');
+      setTranslatedContent(translatedText);
+    } catch (error) {
+      console.error('Translation error:', error);
+      toast({
+        title: t('common.error'),
+        description: "Failed to translate content",
+        variant: "destructive",
+      });
+    } finally {
+      setIsTranslating(false);
+    }
+  };
 
   if (isLoading || !post) {
     return (
@@ -109,8 +135,21 @@ export const BlogPost = () => {
           onShare={handleShare}
         />
 
+        <div className="flex justify-end mb-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={translateContent}
+            disabled={isTranslating}
+            className="flex items-center gap-2"
+          >
+            <Languages className="w-4 h-4" />
+            {translatedContent ? t('blog.originalContent') : t('blog.translateContent')}
+          </Button>
+        </div>
+
         <div className="prose prose-lg prose-gray dark:prose-invert max-w-none">
-          {post.content}
+          {translatedContent || post.content}
         </div>
       </article>
 

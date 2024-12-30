@@ -16,7 +16,18 @@
     "by": "VON",
     "publishedPosts": "Veröffentlichte Beiträge",
     "noPostsFound": "Keine Beiträge gefunden",
-    "checkBack": "Schauen Sie bald wieder vorbei!"
+    "checkBack": "Schauen Sie bald wieder vorbei!",
+    "backToArticles": "Zurück zu den Artikeln",
+    "share": "Teilen",
+    "publish": "Veröffentlichen",
+    "readingTime": "min Lesezeit",
+    "comments": "Kommentare",
+    "addComment": "Kommentar hinzufügen",
+    "yourName": "Ihr Name",
+    "submitComment": "Absenden",
+    "translateContent": "Inhalt übersetzen",
+    "originalContent": "Originalinhalt",
+    "gridView": "Rasteransicht"
   },
   "footer": {
     "about": "Über uns",

@@ -136,6 +136,51 @@ export const themes = {
   },
 };
 
+// Helper function to convert hex to HSL
+const hexToHSL = (hex: string) => {
+  // Remove the # if present
+  hex = hex.replace('#', '');
+
+  // Convert hex to RGB
+  const r = parseInt(hex.substring(0, 2), 16) / 255;
+  const g = parseInt(hex.substring(2, 4), 16) / 255;
+  const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+  // Find max and min values
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  
+  let h = 0;
+  let s = 0;
+  let l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
+    }
+    
+    h /= 6;
+  }
+
+  // Convert to degrees and percentages
+  h = Math.round(h * 360);
+  s = Math.round(s * 100);
+  l = Math.round(l * 100);
+
+  return `${h} ${s}% ${l}%`;
+};
+
 interface ThemeState {
   currentTheme: ThemeName;
   setTheme: (theme: ThemeName) => void;
@@ -149,17 +194,24 @@ export const useSiteTheme = create<ThemeState>()(
         set({ currentTheme: theme });
         const selectedTheme = themes[theme];
         
-        // Update CSS variables
-        document.documentElement.style.setProperty('--primary-100', selectedTheme.primary100);
-        document.documentElement.style.setProperty('--primary-200', selectedTheme.primary200);
-        document.documentElement.style.setProperty('--primary-300', selectedTheme.primary300);
-        document.documentElement.style.setProperty('--accent-100', selectedTheme.accent100);
-        document.documentElement.style.setProperty('--accent-200', selectedTheme.accent200);
-        document.documentElement.style.setProperty('--text-100', selectedTheme.text100);
-        document.documentElement.style.setProperty('--text-200', selectedTheme.text200);
-        document.documentElement.style.setProperty('--bg-100', selectedTheme.bg100);
-        document.documentElement.style.setProperty('--bg-200', selectedTheme.bg200);
-        document.documentElement.style.setProperty('--bg-300', selectedTheme.bg300);
+        // Update CSS variables with HSL values
+        document.documentElement.style.setProperty('--background', hexToHSL(selectedTheme.bg100));
+        document.documentElement.style.setProperty('--foreground', hexToHSL(selectedTheme.text100));
+        document.documentElement.style.setProperty('--card', hexToHSL(selectedTheme.bg200));
+        document.documentElement.style.setProperty('--card-foreground', hexToHSL(selectedTheme.text100));
+        document.documentElement.style.setProperty('--popover', hexToHSL(selectedTheme.bg200));
+        document.documentElement.style.setProperty('--popover-foreground', hexToHSL(selectedTheme.text100));
+        document.documentElement.style.setProperty('--primary', hexToHSL(selectedTheme.primary100));
+        document.documentElement.style.setProperty('--primary-foreground', hexToHSL(selectedTheme.text100));
+        document.documentElement.style.setProperty('--secondary', hexToHSL(selectedTheme.bg200));
+        document.documentElement.style.setProperty('--secondary-foreground', hexToHSL(selectedTheme.text100));
+        document.documentElement.style.setProperty('--muted', hexToHSL(selectedTheme.bg300));
+        document.documentElement.style.setProperty('--muted-foreground', hexToHSL(selectedTheme.text200));
+        document.documentElement.style.setProperty('--accent', hexToHSL(selectedTheme.accent100));
+        document.documentElement.style.setProperty('--accent-foreground', hexToHSL(selectedTheme.text100));
+        document.documentElement.style.setProperty('--border', hexToHSL(selectedTheme.bg300));
+        document.documentElement.style.setProperty('--input', hexToHSL(selectedTheme.bg200));
+        document.documentElement.style.setProperty('--ring', hexToHSL(selectedTheme.primary200));
       },
     }),
     {
@@ -167,17 +219,7 @@ export const useSiteTheme = create<ThemeState>()(
       onRehydrateStorage: () => (state) => {
         // Apply theme when storage is rehydrated
         if (state) {
-          const selectedTheme = themes[state.currentTheme];
-          document.documentElement.style.setProperty('--primary-100', selectedTheme.primary100);
-          document.documentElement.style.setProperty('--primary-200', selectedTheme.primary200);
-          document.documentElement.style.setProperty('--primary-300', selectedTheme.primary300);
-          document.documentElement.style.setProperty('--accent-100', selectedTheme.accent100);
-          document.documentElement.style.setProperty('--accent-200', selectedTheme.accent200);
-          document.documentElement.style.setProperty('--text-100', selectedTheme.text100);
-          document.documentElement.style.setProperty('--text-200', selectedTheme.text200);
-          document.documentElement.style.setProperty('--bg-100', selectedTheme.bg100);
-          document.documentElement.style.setProperty('--bg-200', selectedTheme.bg200);
-          document.documentElement.style.setProperty('--bg-300', selectedTheme.bg300);
+          state.setTheme(state.currentTheme);
         }
       },
     }

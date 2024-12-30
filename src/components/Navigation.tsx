@@ -11,7 +11,6 @@ interface Category {
   name: string;
 }
 
-// Add visibility state interface
 interface VisibilityState {
   about: boolean;
   contact: boolean;
@@ -41,7 +40,7 @@ export const Navigation = () => {
     };
 
     // Fetch visibility settings from localStorage
-    const storedVisibility = localStorage.getItem('dashboardVisibility');
+    const storedVisibility = localStorage.getItem('frontendVisibility');
     if (storedVisibility) {
       setVisibility(JSON.parse(storedVisibility));
     }
@@ -49,7 +48,7 @@ export const Navigation = () => {
     fetchCategories();
   }, []);
 
-  // Only show navigation items if they're visible
+  // Only show navigation items if they're visible in frontend
   const navItems = [
     { path: "/", label: "Accueil", icon: Home, alwaysShow: true },
     { path: "/about", label: "À Propos", icon: Info, showIf: visibility.about },

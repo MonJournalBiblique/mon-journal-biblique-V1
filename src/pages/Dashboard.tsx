@@ -10,6 +10,7 @@ import { useCategories } from "@/hooks/useCategories";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
 
 const POSTS_PER_PAGE = 10;
 
@@ -24,6 +25,7 @@ const Dashboard = () => {
   const { categories, refreshCategories } = useCategories();
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const { toast } = useToast();
   const [visibility, setVisibility] = useState<VisibilityState>({
     about: true,
     contact: true,
@@ -32,7 +34,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     // Load visibility settings from localStorage
-    const storedVisibility = localStorage.getItem('dashboardVisibility');
+    const storedVisibility = localStorage.getItem('frontendVisibility');
     if (storedVisibility) {
       setVisibility(JSON.parse(storedVisibility));
     }
@@ -44,7 +46,12 @@ const Dashboard = () => {
       [key]: !visibility[key],
     };
     setVisibility(newVisibility);
-    localStorage.setItem('dashboardVisibility', JSON.stringify(newVisibility));
+    localStorage.setItem('frontendVisibility', JSON.stringify(newVisibility));
+    
+    toast({
+      title: "Visibility Updated",
+      description: `${key} page is now ${newVisibility[key] ? 'visible' : 'hidden'} on the frontend`,
+    });
   };
 
   const filteredPosts = posts.filter(post => 
@@ -66,7 +73,7 @@ const Dashboard = () => {
       />
 
       <div className="mb-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-        <h2 className="text-xl font-semibold mb-4">Visibilité des Pages</h2>
+        <h2 className="text-xl font-semibold mb-4">Frontend Page Visibility</h2>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <Label htmlFor="about-visibility">Page À Propos</Label>
@@ -85,7 +92,7 @@ const Dashboard = () => {
             />
           </div>
           <div className="flex items-center justify-between">
-            <Label htmlFor="categories-visibility">Catégories</Label>
+            <Label htmlFor="categories-visibility">Categories</Label>
             <Switch
               id="categories-visibility"
               checked={visibility.categories}
@@ -98,9 +105,9 @@ const Dashboard = () => {
       <Tabs defaultValue="posts" className="mt-8">
         <TabsList className="mb-4">
           <TabsTrigger value="posts">Articles</TabsTrigger>
-          {visibility.categories && <TabsTrigger value="categories">Catégories</TabsTrigger>}
-          {visibility.about && <TabsTrigger value="about">À Propos</TabsTrigger>}
-          {visibility.contact && <TabsTrigger value="contact">Contact</TabsTrigger>}
+          <TabsTrigger value="categories">Catégories</TabsTrigger>
+          <TabsTrigger value="about">À Propos</TabsTrigger>
+          <TabsTrigger value="contact">Contact</TabsTrigger>
         </TabsList>
 
         <TabsContent value="posts">
@@ -131,29 +138,23 @@ const Dashboard = () => {
           </div>
         </TabsContent>
 
-        {visibility.categories && (
-          <TabsContent value="categories">
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4">Gestion des Catégories</h2>
-              <CategoryManager 
-                categories={categories}
-                onCategoryChange={refreshCategories}
-              />
-            </div>
-          </TabsContent>
-        )}
+        <TabsContent value="categories">
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">Gestion des Catégories</h2>
+            <CategoryManager 
+              categories={categories}
+              onCategoryChange={refreshCategories}
+            />
+          </div>
+        </TabsContent>
 
-        {visibility.about && (
-          <TabsContent value="about">
-            <PageEditor slug="about" />
-          </TabsContent>
-        )}
+        <TabsContent value="about">
+          <PageEditor slug="about" />
+        </TabsContent>
 
-        {visibility.contact && (
-          <TabsContent value="contact">
-            <PageEditor slug="contact" />
-          </TabsContent>
-        )}
+        <TabsContent value="contact">
+          <PageEditor slug="contact" />
+        </TabsContent>
       </Tabs>
     </div>
   );

@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PenIcon, Trash2Icon, EyeIcon, EyeOffIcon, CopyIcon } from "lucide-react";
 import { PostEditor } from "@/components/PostEditor";
 import {
@@ -49,6 +49,7 @@ export const PostsTable = ({
   onSavePost,
 }: PostsTableProps) => {
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
+  const [postToEdit, setPostToEdit] = useState<Post | null>(null);
   const { toast } = useToast();
 
   const handleDuplicate = async (postId: string) => {
@@ -133,23 +134,14 @@ export const PostsTable = ({
                   >
                     <CopyIcon className="h-4 w-4 text-primary" />
                   </Button>
-                  <Sheet>
-                    <SheetTrigger asChild>
-                      <Button variant="ghost" size="sm" className="hover:bg-muted/20">
-                        <PenIcon className="h-4 w-4 text-foreground" />
-                      </Button>
-                    </SheetTrigger>
-                    <SheetContent className="bg-card border-border">
-                      <SheetHeader>
-                        <SheetTitle className="text-foreground">Modifier le Post</SheetTitle>
-                      </SheetHeader>
-                      <PostEditor 
-                        post={post} 
-                        onSubmit={onSavePost}
-                        categories={categories}
-                      />
-                    </SheetContent>
-                  </Sheet>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setPostToEdit(post)}
+                    className="hover:bg-muted/20"
+                  >
+                    <PenIcon className="h-4 w-4 text-foreground" />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -164,6 +156,24 @@ export const PostsTable = ({
           ))}
         </TableBody>
       </Table>
+
+      <Dialog open={!!postToEdit} onOpenChange={() => setPostToEdit(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Modifier le Post</DialogTitle>
+          </DialogHeader>
+          {postToEdit && (
+            <PostEditor 
+              post={postToEdit} 
+              onSubmit={(updatedPost) => {
+                onSavePost(updatedPost);
+                setPostToEdit(null);
+              }}
+              categories={categories}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={!!postToDelete} onOpenChange={() => setPostToDelete(null)}>
         <AlertDialogContent className="bg-card border-border">

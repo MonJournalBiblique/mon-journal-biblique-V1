@@ -60,6 +60,18 @@ function App() {
     };
   }, []);
 
+  // Listen for visibility changes in localStorage
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'frontendVisibility' && e.newValue) {
+        setVisibility(JSON.parse(e.newValue));
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   return (
     <Router>
       <Layout>

@@ -78,6 +78,7 @@ const Dashboard = () => {
         <TabsList className="mb-4">
           <TabsTrigger value="posts">Articles</TabsTrigger>
           <TabsTrigger value="categories">Catégories</TabsTrigger>
+          <TabsTrigger value="visibility">Visibilité</TabsTrigger>
           <TabsTrigger value="styling">Styling</TabsTrigger>
           <TabsTrigger value="footer">Footer</TabsTrigger>
           <TabsTrigger value="about">À Propos</TabsTrigger>
@@ -119,6 +120,38 @@ const Dashboard = () => {
               categories={categories}
               onCategoryChange={refreshCategories}
             />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="visibility">
+          <div className="space-y-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-4">Visibilité des Pages</h2>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="about-visibility">Page À Propos</Label>
+                <Switch
+                  id="about-visibility"
+                  checked={visibility.about}
+                  onCheckedChange={() => toggleVisibility('about')}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="contact-visibility">Page Contact</Label>
+                <Switch
+                  id="contact-visibility"
+                  checked={visibility.contact}
+                  onCheckedChange={() => toggleVisibility('contact')}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="categories-visibility">Catégories</Label>
+                <Switch
+                  id="categories-visibility"
+                  checked={visibility.categories}
+                  onCheckedChange={() => toggleVisibility('categories')}
+                />
+              </div>
+            </div>
           </div>
         </TabsContent>
 

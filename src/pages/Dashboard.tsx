@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { ThemeSelector } from "@/components/dashboard/ThemeSelector";
 
 const POSTS_PER_PAGE = 10;
 
@@ -72,40 +73,11 @@ const Dashboard = () => {
         onSavePost={savePost}
       />
 
-      <div className="mb-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-        <h2 className="text-xl font-semibold mb-4">Frontend Page Visibility</h2>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="about-visibility">Page À Propos</Label>
-            <Switch
-              id="about-visibility"
-              checked={visibility.about}
-              onCheckedChange={() => toggleVisibility('about')}
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <Label htmlFor="contact-visibility">Page Contact</Label>
-            <Switch
-              id="contact-visibility"
-              checked={visibility.contact}
-              onCheckedChange={() => toggleVisibility('contact')}
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <Label htmlFor="categories-visibility">Categories</Label>
-            <Switch
-              id="categories-visibility"
-              checked={visibility.categories}
-              onCheckedChange={() => toggleVisibility('categories')}
-            />
-          </div>
-        </div>
-      </div>
-
       <Tabs defaultValue="posts" className="mt-8">
         <TabsList className="mb-4">
           <TabsTrigger value="posts">Articles</TabsTrigger>
           <TabsTrigger value="categories">Catégories</TabsTrigger>
+          <TabsTrigger value="styling">Styling</TabsTrigger>
           <TabsTrigger value="about">À Propos</TabsTrigger>
           <TabsTrigger value="contact">Contact</TabsTrigger>
         </TabsList>
@@ -145,6 +117,12 @@ const Dashboard = () => {
               categories={categories}
               onCategoryChange={refreshCategories}
             />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="styling">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <ThemeSelector />
           </div>
         </TabsContent>
 

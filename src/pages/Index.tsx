@@ -31,7 +31,7 @@ const Index = () => {
         .select('*')
         .eq('published', true)
         .order('created_at', { ascending: false })
-        .limit(6);
+        .limit(3);  // Only fetch 3 latest posts
       
       if (data) setRecentPosts(data);
     };

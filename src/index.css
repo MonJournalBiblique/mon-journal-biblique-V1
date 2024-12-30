@@ -56,11 +56,6 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    background: linear-gradient(109.6deg, rgba(223,234,247,1) 11.2%, rgba(244,248,252,1) 91.1%);
-  }
-
-  .dark body {
-    background: linear-gradient(109.6deg, rgb(36, 45, 57) 11.2%, rgb(16, 37, 60) 51.2%, rgb(0, 0, 0) 98.6%);
   }
 
   h1, h2, h3, h4, h5, h6 {

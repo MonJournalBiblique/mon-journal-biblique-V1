@@ -9,6 +9,7 @@ import Dashboard from "@/pages/Dashboard";
 import Login from "@/pages/Login";
 import { BlogPost } from "@/components/BlogPost";
 import { useEffect, useState } from "react";
+import "@/i18n/config";
 
 interface VisibilityState {
   about: boolean;

@@ -1,10 +1,17 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, BookOpen, Home, PenTool, ChevronDown, Moon, Sun, Info, Mail } from "lucide-react";
+import { Menu, X, BookOpen, Home, Info, Mail, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
-import { useTheme } from "@/hooks/use-theme";
+import { useLanguage } from "@/hooks/use-language";
+import { useTranslation } from "react-i18next";
 
 interface Category {
   id: string;
@@ -21,7 +28,8 @@ export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [showBlogMenu, setShowBlogMenu] = useState(false);
-  const { theme, toggleTheme } = useTheme();
+  const { language, setLanguage } = useLanguage();
+  const { t } = useTranslation();
   const [visibility, setVisibility] = useState<VisibilityState>({
     about: true,
     contact: true,
@@ -39,7 +47,6 @@ export const Navigation = () => {
       if (data) setCategories(data);
     };
 
-    // Fetch visibility settings from localStorage
     const storedVisibility = localStorage.getItem('frontendVisibility');
     if (storedVisibility) {
       setVisibility(JSON.parse(storedVisibility));
@@ -48,16 +55,20 @@ export const Navigation = () => {
     fetchCategories();
   }, []);
 
-  // Only show navigation items if they're visible in frontend
   const navItems = [
-    { path: "/", label: "Accueil", icon: Home, alwaysShow: true },
-    { path: "/about", label: "À Propos", icon: Info, showIf: visibility.about },
-    { path: "/contact", label: "Contact", icon: Mail, showIf: visibility.contact },
-    { path: "/dashboard", label: "Dashboard", icon: PenTool, alwaysShow: true },
+    { path: "/", label: t('nav.home'), icon: Home, alwaysShow: true },
+    { path: "/about", label: t('nav.about'), icon: Info, showIf: visibility.about },
+    { path: "/contact", label: t('nav.contact'), icon: Mail, showIf: visibility.contact },
   ].filter(item => item.alwaysShow || item.showIf);
 
+  const languages = [
+    { code: 'en', label: 'English' },
+    { code: 'fr', label: 'Français' },
+    { code: 'de', label: 'Deutsch' },
+  ];
+
   return (
-    <nav className="bg-background/40 dark:bg-background/40 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50">
+    <nav className="bg-background/40 backdrop-blur-md border-b border-gray-200/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
@@ -77,21 +88,20 @@ export const Navigation = () => {
             <div className="relative group">
               {visibility.categories && (
                 <button
-                  className="flex items-center text-gray-700 dark:text-gray-300 hover:text-primary transition-colors duration-200 font-medium"
+                  className="flex items-center text-foreground hover:text-primary transition-colors duration-200 font-medium"
                   onClick={() => setShowBlogMenu(!showBlogMenu)}
                 >
-                  Blog
-                  <ChevronDown className="ml-1 h-4 w-4" />
+                  {t('nav.blog')}
                 </button>
               )}
               <div className={cn(
-                "absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 transition-all duration-200",
+                "absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-background ring-1 ring-black ring-opacity-5 transition-all duration-200",
                 showBlogMenu ? "opacity-100 visible" : "opacity-0 invisible"
               )}>
                 <div className="py-1">
                   <Link
                     to="/blog"
-                    className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="block px-4 py-2 text-sm text-foreground hover:bg-primary/10"
                     onClick={() => setShowBlogMenu(false)}
                   >
                     All Posts
@@ -100,7 +110,7 @@ export const Navigation = () => {
                     <Link
                       key={category.id}
                       to={`/blog/category/${category.id}`}
-                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="block px-4 py-2 text-sm text-foreground hover:bg-primary/10"
                       onClick={() => setShowBlogMenu(false)}
                     >
                       {category.name}
@@ -109,18 +119,28 @@ export const Navigation = () => {
                 </div>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              className="ml-4"
-            >
-              {theme === 'dark' ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Languages className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {languages.map((lang) => (
+                  <DropdownMenuItem
+                    key={lang.code}
+                    onClick={() => setLanguage(lang.code)}
+                    className={cn(
+                      "cursor-pointer",
+                      language === lang.code && "bg-primary/10"
+                    )}
+                  >
+                    {lang.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Mobile Menu Button */}
@@ -164,6 +184,22 @@ export const Navigation = () => {
               {category.name}
             </MobileNavLink>
           ))}
+          {languages.map((lang) => (
+            <button
+              key={lang.code}
+              onClick={() => {
+                setLanguage(lang.code);
+                toggleMenu();
+              }}
+              className={cn(
+                "w-full flex items-center px-3 py-2 text-foreground hover:bg-primary/10",
+                language === lang.code && "bg-primary/10"
+              )}
+            >
+              <Languages className="h-5 w-5 mr-2" />
+              {lang.label}
+            </button>
+          ))}
         </div>
       </div>
     </nav>
@@ -173,7 +209,7 @@ export const Navigation = () => {
 const NavLink = ({ to, children }: { to: string; children: React.ReactNode }) => (
   <Link
     to={to}
-    className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 font-medium"
+    className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
   >
     {children}
   </Link>
@@ -190,7 +226,7 @@ const MobileNavLink = ({
 }) => (
   <Link
     to={to}
-    className="flex items-center text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800 px-3 py-2 transition-colors duration-200"
+    className="flex items-center text-foreground hover:text-primary hover:bg-primary/10 px-3 py-2 transition-colors duration-200"
     onClick={onClick}
   >
     {children}

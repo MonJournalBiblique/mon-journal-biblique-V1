@@ -1,0 +1,20 @@
+{
+  "nav": {
+    "home": "Home",
+    "blog": "Blog",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "blog": {
+    "readMore": "READ MORE",
+    "by": "BY",
+    "publishedPosts": "Published Posts",
+    "noPostsFound": "No posts found",
+    "checkBack": "Check back soon for new content!"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  }
+}

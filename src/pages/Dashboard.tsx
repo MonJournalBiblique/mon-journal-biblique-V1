@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { ThemeSelector } from "@/components/dashboard/ThemeSelector";
+import { FooterEditor } from "@/components/dashboard/FooterEditor";
 
 const POSTS_PER_PAGE = 10;
 
@@ -78,6 +79,7 @@ const Dashboard = () => {
           <TabsTrigger value="posts">Articles</TabsTrigger>
           <TabsTrigger value="categories">Catégories</TabsTrigger>
           <TabsTrigger value="styling">Styling</TabsTrigger>
+          <TabsTrigger value="footer">Footer</TabsTrigger>
           <TabsTrigger value="about">À Propos</TabsTrigger>
           <TabsTrigger value="contact">Contact</TabsTrigger>
         </TabsList>
@@ -124,6 +126,10 @@ const Dashboard = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <ThemeSelector />
           </div>
+        </TabsContent>
+
+        <TabsContent value="footer">
+          <FooterEditor />
         </TabsContent>
 
         <TabsContent value="about">

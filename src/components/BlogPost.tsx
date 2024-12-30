@@ -154,7 +154,7 @@ export const BlogPost = () => {
       </article>
 
       <CommentSection postId={postId || ""} />
-      <RelatedPosts posts={[]} />
+      <RelatedPosts currentPostId={postId || ""} categoryId={post?.category_id} />
     </div>
   );
 };

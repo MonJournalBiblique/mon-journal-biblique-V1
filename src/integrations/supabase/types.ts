@@ -62,6 +62,45 @@ export type Database = {
           },
         ]
       }
+      footer_content: {
+        Row: {
+          about_text: string
+          contact_address: string
+          contact_email: string
+          contact_phone: string
+          created_at: string | null
+          id: string
+          social_facebook: string | null
+          social_instagram: string | null
+          social_twitter: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          about_text?: string
+          contact_address?: string
+          contact_email?: string
+          contact_phone?: string
+          created_at?: string | null
+          id?: string
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_twitter?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          about_text?: string
+          contact_address?: string
+          contact_email?: string
+          contact_phone?: string
+          created_at?: string | null
+          id?: string
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_twitter?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       pages: {
         Row: {
           content: string | null

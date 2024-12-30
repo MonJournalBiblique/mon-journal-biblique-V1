@@ -47,6 +47,18 @@ function App() {
 
     checkAdminStatus();
 
+    const handleVisibilityChange = (event: Event) => {
+      const customEvent = event as CustomEvent<VisibilityState>;
+      setVisibility(customEvent.detail);
+    };
+
+    window.addEventListener('visibilityChange', handleVisibilityChange as EventListener);
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'frontendVisibility' && e.newValue) {
+        setVisibility(JSON.parse(e.newValue));
+      }
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
         setIsAdmin(ADMIN_EMAILS.includes(session.user.email || ''));
@@ -57,19 +69,8 @@ function App() {
 
     return () => {
       subscription.unsubscribe();
+      window.removeEventListener('visibilityChange', handleVisibilityChange as EventListener);
     };
-  }, []);
-
-  // Listen for visibility changes in localStorage
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'frontendVisibility' && e.newValue) {
-        setVisibility(JSON.parse(e.newValue));
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   return (

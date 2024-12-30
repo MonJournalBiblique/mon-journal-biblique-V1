@@ -76,6 +76,18 @@ export const Navigation = () => {
     fetchCategories();
     checkAdminStatus();
 
+    const handleVisibilityChange = (event: Event) => {
+      const customEvent = event as CustomEvent<VisibilityState>;
+      setVisibility(customEvent.detail);
+    };
+
+    window.addEventListener('visibilityChange', handleVisibilityChange as EventListener);
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'frontendVisibility' && e.newValue) {
+        setVisibility(JSON.parse(e.newValue));
+      }
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
         setIsAuthenticated(true);
@@ -88,6 +100,7 @@ export const Navigation = () => {
 
     return () => {
       subscription.unsubscribe();
+      window.removeEventListener('visibilityChange', handleVisibilityChange as EventListener);
     };
   }, []);
 

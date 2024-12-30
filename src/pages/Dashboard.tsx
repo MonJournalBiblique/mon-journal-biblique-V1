@@ -35,7 +35,6 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    // Load visibility settings from localStorage
     const storedVisibility = localStorage.getItem('frontendVisibility');
     if (storedVisibility) {
       setVisibility(JSON.parse(storedVisibility));
@@ -50,9 +49,14 @@ const Dashboard = () => {
     setVisibility(newVisibility);
     localStorage.setItem('frontendVisibility', JSON.stringify(newVisibility));
     
+    // Dispatch a custom event to notify other components
+    window.dispatchEvent(new CustomEvent('visibilityChange', { 
+      detail: newVisibility 
+    }));
+    
     toast({
       title: "Visibility Updated",
-      description: `${key} page is now ${newVisibility[key] ? 'visible' : 'hidden'} on the frontend`,
+      description: `${key} page is now ${newVisibility[key] ? 'visible' : 'hidden'}`,
     });
   };
 
@@ -90,7 +94,7 @@ const Dashboard = () => {
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+          <div className="bg-card rounded-lg shadow-md">
             {isLoading ? (
               <div className="p-8 text-center">Loading...</div>
             ) : (
@@ -123,8 +127,8 @@ const Dashboard = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="visibility">
-          <div className="space-y-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <TabsContent value="visibility" className="bg-card rounded-lg shadow-md">
+          <div className="p-6">
             <h2 className="text-xl font-semibold mb-4">Visibilité des Pages</h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -155,8 +159,8 @@ const Dashboard = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="styling">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <TabsContent value="styling" className="bg-card rounded-lg shadow-md">
+          <div className="p-6">
             <ThemeSelector />
           </div>
         </TabsContent>

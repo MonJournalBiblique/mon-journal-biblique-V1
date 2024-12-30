@@ -115,65 +115,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-card text-card-foreground border-t border-border">
-        <div className="container mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">{t('footer.about', 'À Propos')}</h3>
-              <p className="text-muted-foreground">
-                {t('footer.aboutText', 'Mon Journal Biblique est votre compagnon quotidien pour explorer et approfondir votre foi.')}
-              </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">{t('footer.quickLinks', 'Liens Rapides')}</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link to="/blog" className="text-muted-foreground hover:text-primary">
-                    {t('nav.blog', 'Blog')}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/about" className="text-muted-foreground hover:text-primary">
-                    {t('nav.about', 'À Propos')}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/contact" className="text-muted-foreground hover:text-primary">
-                    {t('nav.contact', 'Contact')}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">{t('footer.contact', 'Contact')}</h3>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>Email: contact@monjournalbiblique.com</li>
-                <li>{t('footer.phone', 'Téléphone')}: +33 1 23 45 67 89</li>
-                <li>{t('footer.address', 'Adresse')}: Paris, France</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">{t('footer.followUs', 'Suivez-nous')}</h3>
-              <div className="flex space-x-4">
-                <a href="#" className="text-muted-foreground hover:text-primary">
-                  Facebook
-                </a>
-                <a href="#" className="text-muted-foreground hover:text-primary">
-                  Twitter
-                </a>
-                <a href="#" className="text-muted-foreground hover:text-primary">
-                  Instagram
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-border text-center text-muted-foreground">
-            <p>© {new Date().getFullYear()} {t('footer.copyright', 'Mon Journal Biblique. Tous droits réservés.')}</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

@@ -12,13 +12,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tables } from "@/integrations/supabase/types";
 
-interface Page {
-  id: string;
-  slug: string;
-  title: string;
-  content: string;
-}
+type Page = Tables<'pages'>
 
 export const PageEditor = ({ slug }: { slug: string }) => {
   const { toast } = useToast();
@@ -36,7 +32,7 @@ export const PageEditor = ({ slug }: { slug: string }) => {
       
       if (error) throw error;
       setContent(data.content || '');
-      return data;
+      return data as Page;
     },
   });
 
@@ -85,7 +81,7 @@ export const PageEditor = ({ slug }: { slug: string }) => {
       <CardHeader>
         <CardTitle>{page?.title}</CardTitle>
         <CardDescription>
-          Dernière mise à jour: {new Date(page?.last_updated).toLocaleDateString()}
+          Dernière mise à jour: {new Date(page?.last_updated || '').toLocaleDateString()}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

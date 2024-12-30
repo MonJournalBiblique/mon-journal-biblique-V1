@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tables } from "@/integrations/supabase/types";
+
+type Page = Tables<'pages'>
 
 const About = () => {
   const { data: page, isLoading } = useQuery({
@@ -13,7 +16,7 @@ const About = () => {
         .single();
       
       if (error) throw error;
-      return data;
+      return data as Page;
     },
   });
 

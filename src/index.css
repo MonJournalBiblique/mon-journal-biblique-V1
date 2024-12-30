@@ -54,63 +54,65 @@
   }
 }
 
-/* Table styles with theme support */
-.table-container {
-  @apply bg-card/50 backdrop-blur-sm rounded-lg border border-border;
-}
+@layer components {
+  /* Table styles with theme support */
+  .table-container {
+    @apply bg-background/95 backdrop-blur-sm rounded-lg border border-border;
+  }
 
-.table-header {
-  @apply bg-muted/50;
-}
+  .table-header {
+    @apply bg-muted/50;
+  }
 
-.table-row {
-  @apply border-border hover:bg-muted/20;
-}
+  .table-row {
+    @apply border-border hover:bg-muted/20;
+  }
 
-.table-cell {
-  @apply text-foreground;
-}
+  .table-cell {
+    @apply text-foreground;
+  }
 
-/* Card styles with theme support */
-.card-modern {
-  @apply bg-card text-card-foreground border border-border rounded-lg shadow-sm hover:shadow-md transition-all duration-200;
-}
+  /* Card styles with theme support */
+  .card-modern {
+    @apply bg-card text-card-foreground border border-border rounded-lg shadow-sm hover:shadow-md transition-all duration-200;
+  }
 
-/* Button styles with theme support */
-.btn-modern {
-  @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 transition-colors;
-}
+  /* Button styles with theme support */
+  .btn-modern {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 transition-colors;
+  }
 
-/* Input styles with theme support */
-.input-modern {
-  @apply bg-input text-foreground border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring;
-}
+  /* Input styles with theme support */
+  .input-modern {
+    @apply bg-input text-foreground border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring;
+  }
 
-/* Alert and dialog styles */
-.alert-modern {
-  @apply bg-popover text-popover-foreground border border-border rounded-lg;
-}
+  /* Alert and dialog styles */
+  .alert-modern {
+    @apply bg-popover text-popover-foreground border border-border rounded-lg;
+  }
 
-/* Navigation styles */
-.nav-modern {
-  @apply bg-background/95 backdrop-blur-sm border-b border-border;
-}
+  /* Navigation styles */
+  .nav-modern {
+    @apply bg-background/95 backdrop-blur-sm border-b border-border;
+  }
 
-/* Ensure good text contrast */
-.text-contrast-high {
-  @apply text-foreground;
-}
+  /* Ensure good text contrast */
+  .text-contrast-high {
+    @apply text-foreground;
+  }
 
-.text-contrast-medium {
-  @apply text-muted-foreground;
-}
+  .text-contrast-medium {
+    @apply text-muted-foreground;
+  }
 
-/* Modern container styles */
-.container-modern {
-  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-}
+  /* Modern container styles */
+  .container-modern {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
 
-/* Gradient text effect */
-.gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+  /* Gradient text effect */
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+  }
 }

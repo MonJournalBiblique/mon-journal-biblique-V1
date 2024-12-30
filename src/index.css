@@ -54,31 +54,63 @@
   }
 }
 
-.prose {
-  @apply max-w-none;
+/* Table styles with theme support */
+.table-container {
+  @apply bg-card/50 backdrop-blur-sm rounded-lg border border-border;
 }
 
-.prose h1, .prose h2, .prose h3, .prose h4 {
-  @apply font-serif;
+.table-header {
+  @apply bg-muted/50;
 }
 
-/* Modern card hover effects */
-.card-hover-effect {
-  @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+.table-row {
+  @apply border-border hover:bg-muted/20;
 }
 
-/* Modern button styles */
+.table-cell {
+  @apply text-foreground;
+}
+
+/* Card styles with theme support */
+.card-modern {
+  @apply bg-card text-card-foreground border border-border rounded-lg shadow-sm hover:shadow-md transition-all duration-200;
+}
+
+/* Button styles with theme support */
 .btn-modern {
-  @apply rounded-full px-6 py-3 font-medium transition-all duration-300 
-         hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0;
+  @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 transition-colors;
 }
 
-/* Gradient text effect */
-.gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+/* Input styles with theme support */
+.input-modern {
+  @apply bg-input text-foreground border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring;
+}
+
+/* Alert and dialog styles */
+.alert-modern {
+  @apply bg-popover text-popover-foreground border border-border rounded-lg;
+}
+
+/* Navigation styles */
+.nav-modern {
+  @apply bg-background/95 backdrop-blur-sm border-b border-border;
+}
+
+/* Ensure good text contrast */
+.text-contrast-high {
+  @apply text-foreground;
+}
+
+.text-contrast-medium {
+  @apply text-muted-foreground;
 }
 
 /* Modern container styles */
 .container-modern {
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Gradient text effect */
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
 }

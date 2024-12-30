@@ -64,7 +64,6 @@ export const PostsTable = ({
         description: "Post duplicated successfully",
       });
 
-      // Refresh the page to show the new post
       window.location.reload();
     } catch (error: any) {
       console.error('Error duplicating post:', error);
@@ -76,39 +75,24 @@ export const PostsTable = ({
     }
   };
 
-  const handleDeleteConfirm = (postId: string) => {
-    setPostToDelete(postId);
-  };
-
-  const handleDeleteCancel = () => {
-    setPostToDelete(null);
-  };
-
-  const handleDeleteConfirmed = () => {
-    if (postToDelete) {
-      onDeletePost(postToDelete);
-      setPostToDelete(null);
-    }
-  };
-
   return (
-    <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg">
+    <div className="table-container">
       <Table>
         <TableHeader>
-          <TableRow className="dark:border-gray-700">
-            <TableHead className="dark:text-gray-300">Image</TableHead>
-            <TableHead className="dark:text-gray-300">Titre</TableHead>
-            <TableHead className="dark:text-gray-300">Catégorie</TableHead>
-            <TableHead className="dark:text-gray-300">Auteur</TableHead>
-            <TableHead className="dark:text-gray-300">Date</TableHead>
-            <TableHead className="dark:text-gray-300">Statut</TableHead>
-            <TableHead className="text-right dark:text-gray-300">Actions</TableHead>
+          <TableRow className="table-header">
+            <TableHead className="text-contrast-high">Image</TableHead>
+            <TableHead className="text-contrast-high">Titre</TableHead>
+            <TableHead className="text-contrast-high">Catégorie</TableHead>
+            <TableHead className="text-contrast-high">Auteur</TableHead>
+            <TableHead className="text-contrast-high">Date</TableHead>
+            <TableHead className="text-contrast-high">Statut</TableHead>
+            <TableHead className="text-right text-contrast-high">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {posts.map((post) => (
-            <TableRow key={post.id} className="dark:border-gray-700">
-              <TableCell className="dark:text-gray-300">
+            <TableRow key={post.id} className="table-row">
+              <TableCell className="table-cell">
                 {post.image && (
                   <img
                     src={post.image}
@@ -117,12 +101,12 @@ export const PostsTable = ({
                   />
                 )}
               </TableCell>
-              <TableCell className="font-medium dark:text-gray-300">{post.title}</TableCell>
-              <TableCell className="dark:text-gray-300">
+              <TableCell className="table-cell font-medium">{post.title}</TableCell>
+              <TableCell className="table-cell">
                 {categories.find(cat => cat.id === post.categoryId)?.name || '-'}
               </TableCell>
-              <TableCell className="dark:text-gray-300">{post.author}</TableCell>
-              <TableCell className="dark:text-gray-300">
+              <TableCell className="table-cell">{post.author}</TableCell>
+              <TableCell className="table-cell">
                 {new Date(post.date).toLocaleDateString("fr-FR")}
               </TableCell>
               <TableCell>
@@ -130,11 +114,12 @@ export const PostsTable = ({
                   variant="ghost"
                   size="sm"
                   onClick={() => onTogglePublish(post.id)}
+                  className="hover:bg-muted/20"
                 >
                   {post.published ? (
                     <EyeIcon className="h-4 w-4 text-green-500" />
                   ) : (
-                    <EyeOffIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                    <EyeOffIcon className="h-4 w-4 text-muted-foreground" />
                   )}
                 </Button>
               </TableCell>
@@ -144,18 +129,19 @@ export const PostsTable = ({
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDuplicate(post.id)}
+                    className="hover:bg-muted/20"
                   >
-                    <CopyIcon className="h-4 w-4 text-blue-500" />
+                    <CopyIcon className="h-4 w-4 text-primary" />
                   </Button>
                   <Sheet>
                     <SheetTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <PenIcon className="h-4 w-4" />
+                      <Button variant="ghost" size="sm" className="hover:bg-muted/20">
+                        <PenIcon className="h-4 w-4 text-foreground" />
                       </Button>
                     </SheetTrigger>
-                    <SheetContent className="w-[90vw] sm:max-w-2xl overflow-y-auto">
+                    <SheetContent className="bg-card border-border">
                       <SheetHeader>
-                        <SheetTitle>Modifier le Post</SheetTitle>
+                        <SheetTitle className="text-foreground">Modifier le Post</SheetTitle>
                       </SheetHeader>
                       <PostEditor 
                         post={post} 
@@ -167,9 +153,10 @@ export const PostsTable = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDeleteConfirm(post.id)}
+                    onClick={() => setPostToDelete(post.id)}
+                    className="hover:bg-destructive/20"
                   >
-                    <Trash2Icon className="h-4 w-4 text-red-500" />
+                    <Trash2Icon className="h-4 w-4 text-destructive" />
                   </Button>
                 </div>
               </TableCell>
@@ -179,16 +166,26 @@ export const PostsTable = ({
       </Table>
 
       <AlertDialog open={!!postToDelete} onOpenChange={() => setPostToDelete(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ce post ?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-foreground">Êtes-vous sûr de vouloir supprimer ce post ?</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
               Cette action est irréversible. Le post sera définitivement supprimé.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleDeleteCancel}>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirmed}>Supprimer</AlertDialogAction>
+            <AlertDialogCancel className="bg-muted text-foreground hover:bg-muted/90">Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (postToDelete) {
+                  onDeletePost(postToDelete);
+                  setPostToDelete(null);
+                }
+              }}
+            >
+              Supprimer
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, BookOpen, Home, PenTool, ChevronDown, Moon, Sun } from "lucide-react";
+import { Menu, X, BookOpen, Home, PenTool, ChevronDown, Moon, Sun, Info, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -78,6 +78,8 @@ export const Navigation = () => {
                 </div>
               </div>
             </div>
+            <NavLink to="/about">À Propos</NavLink>
+            <NavLink to="/contact">Contact</NavLink>
             <NavLink to="/dashboard">Dashboard</NavLink>
             <Button
               variant="ghost"
@@ -137,6 +139,14 @@ export const Navigation = () => {
               {category.name}
             </MobileNavLink>
           ))}
+          <MobileNavLink to="/about" onClick={toggleMenu}>
+            <Info className="h-5 w-5 mr-2" />
+            À Propos
+          </MobileNavLink>
+          <MobileNavLink to="/contact" onClick={toggleMenu}>
+            <Mail className="h-5 w-5 mr-2" />
+            Contact
+          </MobileNavLink>
           <MobileNavLink to="/dashboard" onClick={toggleMenu}>
             <PenTool className="h-5 w-5 mr-2" />
             Dashboard

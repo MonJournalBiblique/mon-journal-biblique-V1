@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { BlogCard } from "@/components/BlogCard";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Grid2x2, Grid3x3, Grid4x4 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { DashboardPagination } from "@/components/dashboard/DashboardPagination";
 
 interface Post {
   id: string;
@@ -24,6 +26,9 @@ const CategoryPosts = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [gridSize, setGridSize] = useState(2);
+  const postsPerPage = 4;
 
   useEffect(() => {
     const fetchCategoryAndPosts = async () => {
@@ -55,6 +60,29 @@ const CategoryPosts = () => {
     }
   }, [categoryId]);
 
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost);
+  const totalPages = Math.ceil(posts.length / postsPerPage);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const getGridClass = () => {
+    switch (gridSize) {
+      case 2:
+        return "grid-cols-1 md:grid-cols-2";
+      case 3:
+        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
+      case 4:
+        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+      default:
+        return "grid-cols-1 md:grid-cols-2";
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -75,12 +103,34 @@ const CategoryPosts = () => {
             Explore our collection of articles about {category?.name.toLowerCase()}
           </p>
         </div>
+
+        <div className="flex justify-end gap-2 mb-6">
+          <Button
+            variant={gridSize === 2 ? "default" : "outline"}
+            size="icon"
+            onClick={() => setGridSize(2)}
+          >
+            <Grid2x2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={gridSize === 3 ? "default" : "outline"}
+            size="icon"
+            onClick={() => setGridSize(3)}
+          >
+            <Grid3x3 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={gridSize === 4 ? "default" : "outline"}
+            size="icon"
+            onClick={() => setGridSize(4)}
+          >
+            <Grid4x4 className="h-4 w-4" />
+          </Button>
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
-          {posts.map((post) => (
-            <div key={post.id} className="card-hover-effect">
-              <BlogCard {...post} />
-            </div>
+        <div className={`grid ${getGridClass()} gap-8`}>
+          {currentPosts.map((post) => (
+            <BlogCard key={post.id} {...post} />
           ))}
           {posts.length === 0 && (
             <div className="col-span-full text-center py-12">
@@ -93,6 +143,16 @@ const CategoryPosts = () => {
             </div>
           )}
         </div>
+
+        {posts.length > postsPerPage && (
+          <div className="mt-8">
+            <DashboardPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

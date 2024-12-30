@@ -39,7 +39,7 @@ export const BlogMenu = ({ categories, isVisible }: BlogMenuProps) => {
             className="block px-4 py-2 text-sm text-foreground hover:bg-primary/10"
             onClick={() => setShowMenu(false)}
           >
-            {t('nav.allPosts')}
+            All posts
           </Link>
           {categories.map(category => (
             <Link

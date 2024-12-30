@@ -18,46 +18,34 @@
     --bg-200: #342a45;
     --bg-300: #4d425f;
 
-    /* Map theme colors to Tailwind CSS variables */
-    --background: var(--bg-100);
-    --foreground: var(--text-100);
-    --card: var(--bg-200);
-    --card-foreground: var(--text-100);
-    --popover: var(--bg-200);
-    --popover-foreground: var(--text-100);
-    --primary: var(--primary-100);
-    --primary-foreground: var(--text-100);
-    --secondary: var(--bg-200);
-    --secondary-foreground: var(--text-100);
-    --muted: var(--bg-300);
-    --muted-foreground: var(--text-200);
-    --accent: var(--accent-100);
-    --accent-foreground: var(--text-100);
-    --destructive: #ff0000;
-    --destructive-foreground: var(--text-100);
-    --border: var(--bg-300);
-    --input: var(--bg-200);
-    --ring: var(--primary-200);
+    /* Map theme colors to HSL values for Tailwind */
+    --background: 260 32% 15%;
+    --foreground: 0 0% 100%;
+    --card: 260 20% 21%;
+    --card-foreground: 0 0% 100%;
+    --popover: 260 20% 21%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 263 73% 54%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 260 20% 21%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 260 20% 31%;
+    --muted-foreground: 0 0% 88%;
+    --accent: 281 100% 75%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 260 20% 31%;
+    --input: 260 20% 21%;
+    --ring: 263 100% 69%;
     --radius: 0.5rem;
-  }
-
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground font-sans transition-colors duration-200;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-serif;
   }
 }
 
 @layer components {
   /* Table styles with theme support */
   .table-container {
-    @apply bg-background/95 backdrop-blur-sm rounded-lg border border-border;
+    @apply bg-background/90 backdrop-blur-sm rounded-lg border border-border;
   }
 
   .table-header {
@@ -94,7 +82,7 @@
 
   /* Navigation styles */
   .nav-modern {
-    @apply bg-background/95 backdrop-blur-sm border-b border-border;
+    @apply bg-background/90 backdrop-blur-sm border-b border-border;
   }
 
   /* Ensure good text contrast */

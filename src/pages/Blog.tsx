@@ -3,7 +3,7 @@ import { BlogCard } from "@/components/BlogCard";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardPagination } from "@/components/dashboard/DashboardPagination";
 import { Button } from "@/components/ui/button";
-import { Grid2x2, Grid3x3, Grid4x4 } from "lucide-react";
+import { LayoutGrid, Grid2X2, Grid3X3 } from "lucide-react";
 
 interface Post {
   id: string;
@@ -97,21 +97,21 @@ const Blog = () => {
             size="icon"
             onClick={() => setGridSize(2)}
           >
-            <Grid2x2 className="h-4 w-4" />
+            <Grid2X2 className="h-4 w-4" />
           </Button>
           <Button
             variant={gridSize === 3 ? "default" : "outline"}
             size="icon"
             onClick={() => setGridSize(3)}
           >
-            <Grid3x3 className="h-4 w-4" />
+            <Grid3X3 className="h-4 w-4" />
           </Button>
           <Button
             variant={gridSize === 4 ? "default" : "outline"}
             size="icon"
             onClick={() => setGridSize(4)}
           >
-            <Grid4x4 className="h-4 w-4" />
+            <LayoutGrid className="h-4 w-4" />
           </Button>
         </div>
 

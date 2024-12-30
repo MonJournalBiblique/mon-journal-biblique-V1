@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import { BlogCard } from "@/components/BlogCard";
 
 interface Post {
   id: string;
@@ -11,6 +11,7 @@ interface Post {
   content: string;
   date: string;
   image?: string;
+  author: string;
 }
 
 const heroImages = [
@@ -30,7 +31,7 @@ const Index = () => {
         .select('*')
         .eq('published', true)
         .order('created_at', { ascending: false })
-        .limit(3);
+        .limit(6);
       
       if (data) setRecentPosts(data);
     };
@@ -43,7 +44,7 @@ const Index = () => {
       setCurrentImageIndex((prevIndex) => 
         prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
       );
-    }, 10000); // Change image every 10 seconds
+    }, 10000);
 
     return () => clearInterval(timer);
   }, []);
@@ -89,17 +90,19 @@ const Index = () => {
       {/* Featured Posts */}
       <section className="py-16 bg-background">
         <div className="container">
-          <h2 className="text-3xl font-bold mb-8 text-center">
+          <h2 className="text-3xl font-bold mb-12 text-center">
             Articles Récents
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
             {recentPosts.map((post) => (
-              <PostCard
+              <BlogCard
                 key={post.id}
-                title={post.title}
-                excerpt={post.content?.replace(/<[^>]*>/g, '').substring(0, 150) + '...'}
-                date={post.date}
                 id={post.id}
+                title={post.title}
+                content={post.content || ''}
+                date={post.date}
+                image={post.image}
+                author={post.author}
               />
             ))}
           </div>
@@ -167,34 +170,5 @@ const Index = () => {
     </div>
   );
 };
-
-const PostCard = ({
-  title,
-  excerpt,
-  date,
-  id,
-}: {
-  title: string;
-  excerpt: string;
-  date: string;
-  id: string;
-}) => (
-  <article className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
-    <div className="p-6">
-      <time className="text-sm text-gray-500 dark:text-gray-400">
-        {new Date(date).toLocaleDateString("fr-FR", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })}
-      </time>
-      <h3 className="text-xl font-bold mb-2 mt-1">{title}</h3>
-      <p className="text-gray-600 dark:text-gray-300 mb-4">{excerpt}</p>
-      <Button variant="link" className="p-0" asChild>
-        <Link to={`/blog/${id}`}>Lire la suite →</Link>
-      </Button>
-    </div>
-  </article>
-);
 
 export default Index;

@@ -109,7 +109,7 @@ export const Navigation = () => {
     { path: "/about", label: t('nav.about'), icon: Info, showIf: visibility.about },
     { path: "/contact", label: t('nav.contact'), icon: Mail, showIf: visibility.contact },
     { path: "/dashboard", label: "Dashboard", icon: Shield, showIf: isAdmin },
-  ];
+  ].filter(item => item.showIf);
 
   return (
     <nav className="bg-background/40 backdrop-blur-md border-b border-gray-200/50">

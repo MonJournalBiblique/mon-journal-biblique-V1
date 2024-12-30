@@ -10,6 +10,7 @@ import Login from "@/pages/Login";
 import { BlogPost } from "@/components/BlogPost";
 import { useEffect, useState } from "react";
 import "@/i18n/config";
+import { supabase } from "@/integrations/supabase/client";
 
 interface VisibilityState {
   about: boolean;
@@ -17,18 +18,46 @@ interface VisibilityState {
   categories: boolean;
 }
 
+const ADMIN_EMAILS = [
+  'michele.pouobang@gmail.com',
+  'kamguiac@gmail.com',
+  'guy.christian.kamguia@gmail.com'
+];
+
 function App() {
   const [visibility, setVisibility] = useState<VisibilityState>({
     about: true,
     contact: true,
     categories: true,
   });
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const storedVisibility = localStorage.getItem('frontendVisibility');
     if (storedVisibility) {
       setVisibility(JSON.parse(storedVisibility));
     }
+
+    const checkAdminStatus = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setIsAdmin(ADMIN_EMAILS.includes(session.user.email || ''));
+      }
+    };
+
+    checkAdminStatus();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setIsAdmin(ADMIN_EMAILS.includes(session.user.email || ''));
+      } else {
+        setIsAdmin(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
@@ -50,7 +79,10 @@ function App() {
             path="/contact" 
             element={visibility.contact ? <Contact /> : <Navigate to="/" />} 
           />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route 
+            path="/dashboard" 
+            element={isAdmin ? <Dashboard /> : <Navigate to="/" />} 
+          />
           <Route path="/login" element={<Login />} />
         </Routes>
       </Layout>

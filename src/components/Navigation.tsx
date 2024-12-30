@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, BookOpen, Home, Info, Mail } from "lucide-react";
+import { Menu, X, BookOpen, Home, Info, Mail, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
@@ -20,9 +20,16 @@ interface VisibilityState {
   categories: boolean;
 }
 
+const ADMIN_EMAILS = [
+  'michele.pouobang@gmail.com',
+  'kamguiac@gmail.com',
+  'guy.christian.kamguia@gmail.com'
+];
+
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { t } = useTranslation();
   const [visibility, setVisibility] = useState<VisibilityState>({
     about: true,
@@ -41,18 +48,40 @@ export const Navigation = () => {
       if (data) setCategories(data);
     };
 
+    const checkAdminStatus = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setIsAdmin(ADMIN_EMAILS.includes(session.user.email || ''));
+      }
+    };
+
     const storedVisibility = localStorage.getItem('frontendVisibility');
     if (storedVisibility) {
       setVisibility(JSON.parse(storedVisibility));
     }
 
     fetchCategories();
+    checkAdminStatus();
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setIsAdmin(ADMIN_EMAILS.includes(session.user.email || ''));
+      } else {
+        setIsAdmin(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const navItems = [
     { path: "/", label: t('nav.home'), icon: Home, alwaysShow: true },
     { path: "/about", label: t('nav.about'), icon: Info, showIf: visibility.about },
     { path: "/contact", label: t('nav.contact'), icon: Mail, showIf: visibility.contact },
+    { path: "/dashboard", label: "Dashboard", icon: Shield, showIf: isAdmin },
   ].filter(item => item.alwaysShow || item.showIf);
 
   return (
@@ -63,6 +92,11 @@ export const Navigation = () => {
             <Link to="/" className="flex-shrink-0 flex items-center">
               <BookOpen className="h-8 w-8 text-primary" />
               <span className="ml-2 font-serif text-xl font-semibold">MJB</span>
+              {isAdmin && (
+                <span className="ml-2 text-sm font-medium text-primary bg-primary/10 px-2 py-1 rounded">
+                  Admin
+                </span>
+              )}
             </Link>
           </div>
 
@@ -70,7 +104,10 @@ export const Navigation = () => {
           <div className="hidden sm:flex sm:items-center sm:space-x-8">
             {navItems.map((item) => (
               <NavLink key={item.path} to={item.path}>
-                {item.label}
+                <span className="flex items-center gap-1">
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </span>
               </NavLink>
             ))}
             

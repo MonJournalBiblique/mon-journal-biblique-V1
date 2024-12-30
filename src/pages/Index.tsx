@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 
 interface Post {
   id: string;
@@ -12,8 +13,15 @@ interface Post {
   image?: string;
 }
 
+const heroImages = [
+  "/lovable-uploads/bdb4c884-09f5-4c70-bd21-98a3a2170505.png",
+  "/lovable-uploads/2762b88c-bdb3-4ab2-ba57-96451c0177b9.png",
+  "/lovable-uploads/f695dc06-2bf6-41a3-bee5-2c294716efd3.png"
+];
+
 const Index = () => {
   const [recentPosts, setRecentPosts] = useState<Post[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     const fetchRecentPosts = async () => {
@@ -30,28 +38,48 @@ const Index = () => {
     fetchRecentPosts();
   }, []);
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => 
+        prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 10000); // Change image every 10 seconds
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="animate-fade-in">
       {/* Hero Section */}
-      <section className="bg-secondary/50 dark:bg-secondary/20 relative min-h-[600px] flex items-center">
-        <div className="absolute inset-0">
-          <img
-            src="/placeholder.svg"
-            alt="Bible ouverte"
-            className="w-full h-full object-cover opacity-20"
-          />
+      <section className="relative min-h-[calc(100vh-4rem)] flex items-center">
+        <div className="absolute inset-0 overflow-hidden">
+          {heroImages.map((image, index) => (
+            <div
+              key={image}
+              className={`absolute inset-0 transition-opacity duration-1000 ${
+                index === currentImageIndex ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <img
+                src={image}
+                alt={`Hero image ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/50" />
+            </div>
+          ))}
         </div>
         <div className="container relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <BookOpen className="h-16 w-16 mx-auto mb-6 text-primary" />
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <div className="max-w-3xl mx-auto text-center text-white">
+            <BookOpen className="h-16 w-16 mx-auto mb-6 text-white" />
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
               Mon Journal Biblique
             </h1>
-            <p className="text-xl mb-8 text-gray-700 dark:text-gray-300">
+            <p className="text-xl mb-8">
               Explorez la foi chrétienne à travers des réflexions profondes et des
               perspectives inspirantes.
             </p>
-            <Button asChild size="lg">
+            <Button asChild size="lg" variant="outline" className="bg-white/10 hover:bg-white/20 border-white text-white">
               <Link to="/blog">Découvrir les Articles</Link>
             </Button>
           </div>
@@ -59,7 +87,7 @@ const Index = () => {
       </section>
 
       {/* Featured Posts */}
-      <section className="py-16">
+      <section className="py-16 bg-background">
         <div className="container">
           <h2 className="text-3xl font-bold mb-8 text-center">
             Articles Récents
@@ -79,7 +107,7 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-background/80 dark:bg-background/80 backdrop-blur-sm border-t border-gray-200 dark:border-gray-800">
+      <footer className="bg-background/80 dark:bg-gray-900/80 backdrop-blur-sm border-t border-gray-200 dark:border-gray-800">
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>

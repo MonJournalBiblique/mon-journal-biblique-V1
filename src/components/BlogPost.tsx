@@ -16,6 +16,7 @@ interface Post {
   date: string;
   author: string;
   image: string;
+  category_id?: string;
 }
 
 const calculateReadingTime = (content: string): number => {

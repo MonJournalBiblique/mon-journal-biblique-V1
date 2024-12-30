@@ -5,12 +5,28 @@
     "about": "About",
     "contact": "Contact"
   },
+  "home": {
+    "title": "My Biblical Journal",
+    "subtitle": "Explore Christian faith through deep reflections and inspiring perspectives.",
+    "discoverArticles": "Discover Articles",
+    "recentArticles": "Recent Articles"
+  },
   "blog": {
     "readMore": "READ MORE",
     "by": "BY",
     "publishedPosts": "Published Posts",
     "noPostsFound": "No posts found",
     "checkBack": "Check back soon for new content!"
+  },
+  "footer": {
+    "about": "About",
+    "aboutText": "My Biblical Journal is your daily companion to explore and deepen your faith.",
+    "quickLinks": "Quick Links",
+    "contact": "Contact",
+    "phone": "Phone",
+    "address": "Address",
+    "followUs": "Follow Us",
+    "copyright": "My Biblical Journal. All rights reserved."
   },
   "common": {
     "loading": "Loading...",

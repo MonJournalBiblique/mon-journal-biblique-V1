@@ -5,12 +5,28 @@
     "about": "À Propos",
     "contact": "Contact"
   },
+  "home": {
+    "title": "Mon Journal Biblique",
+    "subtitle": "Explorez la foi chrétienne à travers des réflexions profondes et des perspectives inspirantes.",
+    "discoverArticles": "Découvrir les Articles",
+    "recentArticles": "Articles Récents"
+  },
   "blog": {
     "readMore": "LIRE LA SUITE",
     "by": "PAR",
     "publishedPosts": "Articles Publiés",
     "noPostsFound": "Aucun article trouvé",
     "checkBack": "Revenez bientôt pour du nouveau contenu !"
+  },
+  "footer": {
+    "about": "À Propos",
+    "aboutText": "Mon Journal Biblique est votre compagnon quotidien pour explorer et approfondir votre foi.",
+    "quickLinks": "Liens Rapides",
+    "contact": "Contact",
+    "phone": "Téléphone",
+    "address": "Adresse",
+    "followUs": "Suivez-nous",
+    "copyright": "Mon Journal Biblique. Tous droits réservés."
   },
   "common": {
     "loading": "Chargement...",

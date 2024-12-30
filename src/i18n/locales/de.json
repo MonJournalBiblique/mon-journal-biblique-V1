@@ -5,12 +5,28 @@
     "about": "Über uns",
     "contact": "Kontakt"
   },
+  "home": {
+    "title": "Mein Biblisches Tagebuch",
+    "subtitle": "Erkunden Sie den christlichen Glauben durch tiefgründige Reflexionen und inspirierende Perspektiven.",
+    "discoverArticles": "Artikel entdecken",
+    "recentArticles": "Aktuelle Artikel"
+  },
   "blog": {
     "readMore": "WEITERLESEN",
     "by": "VON",
     "publishedPosts": "Veröffentlichte Beiträge",
     "noPostsFound": "Keine Beiträge gefunden",
     "checkBack": "Schauen Sie bald wieder vorbei!"
+  },
+  "footer": {
+    "about": "Über uns",
+    "aboutText": "Mein Biblisches Tagebuch ist Ihr täglicher Begleiter zum Erkunden und Vertiefen Ihres Glaubens.",
+    "quickLinks": "Schnellzugriff",
+    "contact": "Kontakt",
+    "phone": "Telefon",
+    "address": "Adresse",
+    "followUs": "Folgen Sie uns",
+    "copyright": "Mein Biblisches Tagebuch. Alle Rechte vorbehalten."
   },
   "common": {
     "loading": "Laden...",
